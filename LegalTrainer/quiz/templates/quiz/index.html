@@ -6,4 +6,19 @@
 
 {% block content %}
     <h2>Content_temp</h2>
+
+    {% if user.is_authenticated %}
+        <h3> Вы авторизованы как {{ user.username }}</h3>
+    {% else %}
+        <h3>Вы не авторизованы</h3>
+    {% endif %}
+
+    <br><br>
+
+    {% if user.is_authenticated %}
+        <p>{{ user.username }} <a href="{% url 'logout_url' %}">ВЫЙТИ</a></p>
+    {% else %}
+        <p><a href="{% url 'login_url' %}">ВОЙТИ</a></p>
+        <p><a href="{% url 'register_url' %}">РЕГИСТРАЦИЯ</a></p>
+    {% endif %}
 {% endblock %}

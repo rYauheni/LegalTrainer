@@ -1,0 +1,17 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}
+    Регистрация
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+<!--        {% for field in form %}-->
+<!--            <p><label class="form_label" for="{{ field.id_for_label }}">{{ field.label }}: </label></p>-->
+<!--            <div class="form-error">{{ field.errors }}</div>-->
+<!--        {% endfor %}-->
+        {{ form.as_p }}
+        <button type="submit">Зарегистрировать</button>
+    </form>
+{% endblock %}

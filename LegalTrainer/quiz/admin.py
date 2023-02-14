@@ -6,9 +6,10 @@ from .models import Category, Question, Answer
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title']
+    list_display = ['id', 'title', 'slug']
     list_editable = ['title']
     search_fields = ['title']
+    readonly_fields = ['slug']
 
 
 @admin.register(Question)
