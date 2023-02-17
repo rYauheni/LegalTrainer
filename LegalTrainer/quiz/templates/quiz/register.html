@@ -1,17 +1,23 @@
 {% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
-    Регистрация
+Регистрация
 {% endblock %}
 
 {% block content %}
-    <form method="post">
-        {% csrf_token %}
-<!--        {% for field in form %}-->
-<!--            <p><label class="form_label" for="{{ field.id_for_label }}">{{ field.label }}: </label></p>-->
-<!--            <div class="form-error">{{ field.errors }}</div>-->
-<!--        {% endfor %}-->
-        {{ form.as_p }}
-        <button type="submit">Зарегистрировать</button>
-    </form>
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <!--    CAPTCHA RELOAD BUTTON-->
+    <script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'quiz/js/captcha.js' %}"></script>
+    <button class='captcha-refresh'>
+        <img src="{% static 'quiz/img/reload.png' %}">
+    </button>
+
+    <button type="submit">Зарегистрировать</button>
+</form>
 {% endblock %}
