@@ -10,6 +10,8 @@ urlpatterns = [
     path('logout', views.logout_user, name='logout_url'),
     path('categories', views.CategoryListView.as_view(), name='categories_list_url'),
     path('categories/<slug:slug_category>', views.CategoryDetailView.as_view(), name='category_url'),
-    path('quiz/question/<question_id>', views.get_question, name='question_url'),
+
+    path('quiz/question', views.get_question, name='question_url'),
+    path('quiz/<slug:slug_category>', views.set_test, name='set_test_url'),
 
 ]

@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 # from django.utils.text import slugify
 from django.urls import reverse
 from pytils.translit import slugify
@@ -39,3 +40,15 @@ class Answer(models.Model):
 
     def __str__(self):
         return f'{self.content}'
+
+
+class UserAnswer(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, null=True)
+    correctness = models.BooleanField()
+
+
+class Test(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, null=True)
+    is_answered = models.BooleanField(default=False)

@@ -5,9 +5,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView
+from django.db.models import Max, Count
 
-from .models import Category, Question, Answer
-from .forms import RegisterUserForm, LoginUserForm
+from random import shuffle, choice, choices
+
+from .models import Category, Question, Answer, Test
+from .forms import RegisterUserForm, LoginUserForm, AnswersForm
 
 
 # Create your views here.
@@ -39,15 +42,6 @@ class CategoryDetailView(DetailView):
     context_object_name = 'category'
 
 
-def get_question(request, question_id):
-    question = Question.objects.get(id=question_id)
-    answers = Answer.objects.filter(question=question.id)
-    return render(request, 'quiz/question.html', context={
-        'question': question,
-        'answers': answers
-    })
-
-
 class RegisterUser(CreateView):
     form_class = RegisterUserForm
     template_name = 'quiz/register.html'
@@ -74,3 +68,43 @@ class LoginUser(LoginView):
 def logout_user(request):
     logout(request)
     return redirect('login_url')
+
+
+def set_test(request, slug_category):
+    category_id = Category.objects.get(slug=slug_category)
+    questions = Question.objects.filter(category=category_id)
+    id_list = []
+    for question in questions:
+        id_list.append(question.id)
+    shuffle(id_list)
+    if len(id_list) >= 10:
+        id_list = id_list[:10]
+    questions = questions.filter(id__in=id_list).order_by('?')
+    answers = Answer.objects.filter(question__in=id_list)
+    #################################################################
+    Test.objects.filter(user=request.user).delete()
+    for question in questions:
+        Test(user=request.user, question=question, is_answered=False).save()
+    #################################################################
+    return render(request, 'quiz/CHECK_TEST.html', context={
+        'questions': questions,
+        'answers': answers
+    })
+
+
+def get_question(request):
+    questions = Test.objects.filter(user=request.user)
+    question, answers = None, None
+    if questions.aggregate(Count('is_answered')):
+        for q in questions:
+            if not q.is_answered:
+                question = Question.objects.get(content=q.question)
+                break
+        answers = Answer.objects.filter(question=question.id)
+    else:
+        pass  # ЛОГИКА ЗАВЕРШЕНИЯ ТЕСТА
+    return render(request, 'quiz/question.html', context={
+        'question': question,
+        'answers': answers,
+        'form': AnswersForm(),
+    })
