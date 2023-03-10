@@ -42,13 +42,17 @@ class Answer(models.Model):
         return f'{self.content}'
 
 
-class UserAnswer(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    question = models.ForeignKey('Question', on_delete=models.CASCADE, null=True)
-    correctness = models.BooleanField()
-
-
 class Test(models.Model):
+    date = models.DateField(auto_now_add=True)
+    questions = models.ManyToManyField('Question', blank=True)
+
+
+class UserTestModel(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    question = models.ForeignKey('Question', on_delete=models.CASCADE, null=True)
-    is_answered = models.BooleanField(default=False)
+    test = models.ForeignKey('Test', on_delete=models.CASCADE)
+    answers = models.ManyToManyField('Answer', blank=True)
+
+
+class TestAnswer(models.Model):  ##### модель для ответа пользователя на тест
+    test = models.ForeignKey('Test', on_delete=models.CASCADE)
+    answers = models.ManyToManyField('Answer', blank=True)

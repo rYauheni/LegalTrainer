@@ -9,7 +9,7 @@ from django.db.models import Max, Count
 
 from random import shuffle, choice, choices
 
-from .models import Category, Question, Answer, Test
+from .models import Category, Question, Answer, Test, UserTestModel, TestAnswer
 from .forms import RegisterUserForm, LoginUserForm, AnswersForm
 
 
@@ -71,7 +71,7 @@ def logout_user(request):
 
 
 def set_test(request, slug_category):
-    category_id = Category.objects.get(slug=slug_category)
+    category_id = category_id = Category.objects.get(slug=slug_category)
     questions = Question.objects.filter(category=category_id)
     id_list = []
     for question in questions:
@@ -82,9 +82,20 @@ def set_test(request, slug_category):
     questions = questions.filter(id__in=id_list).order_by('?')
     answers = Answer.objects.filter(question__in=id_list)
     #################################################################
-    Test.objects.filter(user=request.user).delete()
+    test = Test()
+    test.save()
     for question in questions:
-        Test(user=request.user, question=question, is_answered=False).save()
+        test.questions.add(question)
+
+    # test_answer = TestAnswer(test=test)
+    # test_answer.save()
+    # for answer in answers:
+    #     test_answer.answers.add(answer)
+
+    user_test = UserTestModel(user=request.user, test=test)
+    user_test.save()
+    for answer in answers:
+        user_test.answers.add(answer)
     #################################################################
     return render(request, 'quiz/CHECK_TEST.html', context={
         'questions': questions,
