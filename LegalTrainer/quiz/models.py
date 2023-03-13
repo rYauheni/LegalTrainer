@@ -50,7 +50,7 @@ class Test(models.Model):
 class UserTestModel(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     test = models.ForeignKey('Test', on_delete=models.CASCADE)
-    answers = models.ManyToManyField('Answer', blank=True)
+    counter = models.IntegerField(default=0)
 
 
 class TestAnswer(models.Model):  ##### модель для ответа пользователя на тест

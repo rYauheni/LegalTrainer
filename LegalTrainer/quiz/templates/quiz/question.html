@@ -5,14 +5,28 @@ Question
 {% endblock %}
 
 {% block content %}
-<h2>{{ question.content }}</h2>
-<ul>
-    {% for answer in answers %}
-    <li>
-        {% csrf_token %}
-        {{ form.as_p }}
-        {{ answer }}
-    </li>
-    {% endfor %}
-</ul>
+<!--<h2>{{ question.content }}</h2>-->
+<!--<ul>-->
+<!--    {% for answer in answers %}-->
+<!--    <li>-->
+<!--        {% csrf_token %}-->
+<!--        {{ form.as_p }}-->
+<!--        {{ answer }}-->
+<!--    </li>-->
+<!--    {% endfor %}-->
+<!--</ul>-->
+ {{ user_test }}
+<br>
+{{ test }}
+<br>
+{{ questions }}
+<br>
+{{ counter }}
+<br>
+<hr>
+<hr>
+<h3>{{ question }}</h3>
+{% for answer in answers %}
+  <p>{{ answer }}</p>
+{% endfor %}
 {% endblock %}

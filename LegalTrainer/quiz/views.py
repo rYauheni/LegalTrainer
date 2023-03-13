@@ -94,8 +94,6 @@ def set_test(request, slug_category):
 
     user_test = UserTestModel(user=request.user, test=test)
     user_test.save()
-    for answer in answers:
-        user_test.answers.add(answer)
     #################################################################
     return render(request, 'quiz/CHECK_TEST.html', context={
         'questions': questions,
@@ -104,18 +102,41 @@ def set_test(request, slug_category):
 
 
 def get_question(request):
-    questions = Test.objects.filter(user=request.user)
-    question, answers = None, None
-    if questions.aggregate(Count('is_answered')):
-        for q in questions:
-            if not q.is_answered:
-                question = Question.objects.get(content=q.question)
-                break
-        answers = Answer.objects.filter(question=question.id)
-    else:
+    # questions = Test.objects.filter(user=request.user)
+    # question, answers = None, None
+    # if questions.aggregate(Count('is_answered')):
+    #     for q in questions:
+    #         if not q.is_answered:
+    #             question = Question.objects.get(content=q.question)
+    #             break
+    #     answers = Answer.objects.filter(question=question.id)
+    # else:
+    #     pass  # ЛОГИКА ЗАВЕРШЕНИЯ ТЕСТА
+    # return render(request, 'quiz/question.html', context={
+    #     'question': question,
+    #     'answers': answers,
+    #     'form': AnswersForm(),
+    # })
+    user_tests = UserTestModel.objects.filter(user=request.user)
+    last_number = len(user_tests) - 1
+    user_test = user_tests[last_number]
+    counter = user_test.counter
+    test = Test.objects.get(usertestmodel=user_test)
+    questions = test.questions.all()
+    question = questions[counter]
+    answers = Answer.objects.filter(question=question)
+    if 0 <= counter < 9:
+        user_test.counter += 1
+        user_test.save()
+    elif counter == 9:
         pass  # ЛОГИКА ЗАВЕРШЕНИЯ ТЕСТА
+    else:
+        raise ValueError('Counter value must be in range(0, 10)')
     return render(request, 'quiz/question.html', context={
+        'user_test': user_test,
+        'test': test,
+        'questions': questions,
         'question': question,
         'answers': answers,
-        'form': AnswersForm(),
+        'counter': counter,
     })
