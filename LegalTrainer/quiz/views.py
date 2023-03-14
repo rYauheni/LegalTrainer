@@ -73,9 +73,7 @@ def logout_user(request):
 def set_test(request, slug_category):
     category_id = category_id = Category.objects.get(slug=slug_category)
     questions = Question.objects.filter(category=category_id)
-    id_list = []
-    for question in questions:
-        id_list.append(question.id)
+    id_list = [question.id for question in questions]
     shuffle(id_list)
     if len(id_list) >= 10:
         id_list = id_list[:10]
