@@ -29,4 +29,14 @@ Question
 {% for answer in answers %}
   <p>{{ answer }}</p>
 {% endfor %}
+<br>
+<hr>
+<hr>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" name="previous">PREVIOUS</button>
+        <button type="submit" name="next">NEXT</button>
+    </form>
 {% endblock %}

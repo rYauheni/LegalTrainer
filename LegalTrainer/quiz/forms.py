@@ -20,13 +20,6 @@ class LoginUserForm(AuthenticationForm):
     username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
 
-DEMO_CHOICES =(
-    ("1", "Naveen"),
-    ("2", "Pranav"),
-    ("3", "Isha"),
-    ("4", "Saloni"),
-)
 
-
-class AnswersForm(forms.Form):
-    answers = forms.BooleanField()
+class UserAnswersForm(forms.Form):
+    answers = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple, )
