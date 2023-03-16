@@ -1,0 +1,19 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}
+    Test
+{% endblock %}
+
+{% block content %}
+    <ol>
+        {% for question in questions %}
+            <li>{{ question }}</li>
+            {% for answer in answers %}
+                {% if question == answer.question %}
+                    <p>{{ answer }}</p>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </ol>
+
+{% endblock %}

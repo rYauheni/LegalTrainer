@@ -126,8 +126,7 @@ def get_question(request, q_number):
     answers = Answer.objects.filter(question=question)
 
     #################
-    form = UserAnswersForm()
-    form.answers = answers
+    form = UserAnswersForm(answers=answers)
     #################
 
     if request.method == 'GET':
@@ -143,13 +142,17 @@ def get_question(request, q_number):
     elif request.method == 'POST':
         form = UserAnswersForm(request.POST)
         if 0 <= counter < QUESTIONS_QUANTITY - 1:
-            user_test.counter += 1
-            user_test.save()
+            url = reverse('question_url', args=(q_number,))
             if form.is_valid():
                 if 'previous' in request.POST:
-                    q_number = user_test.counter - 2
+                    if user_test.counter > 0:
+                        user_test.counter -= 1
+                        user_test.save()
+                    q_number = user_test.counter
                     url = reverse('question_url', args=(q_number,))
                 elif 'next' in request.POST:
+                    user_test.counter += 1
+                    user_test.save()
                     q_number = user_test.counter
                     url = reverse('question_url', args=(q_number,))
         elif counter == QUESTIONS_QUANTITY - 1:

@@ -32,11 +32,18 @@ Question
 <br>
 <hr>
 <hr>
+<h2> Question #{{ user_test.counter|add:"1" }}: {{ question }} </h2>
+<h3>Answers:</h3>
+<form method="post">
+    {% csrf_token %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" name="previous">PREVIOUS</button>
-        <button type="submit" name="next">NEXT</button>
-    </form>
+    {% for field in form.fields %}
+    <p>
+        <input type="checkbox" value="{{item.id}}" name="choices">
+        {{ field }}
+    </p>
+    {% endfor %}
+    <button type="submit" name="previous">PREVIOUS</button>
+    <button type="submit" name="next">NEXT</button>
+</form>
 {% endblock %}
