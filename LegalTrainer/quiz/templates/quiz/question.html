@@ -34,7 +34,7 @@ Question
 <hr>
 <h2> Question #{{ user_test.counter|add:"1" }}: {{ question }} </h2>
 <h3>Answers:</h3>
-<form method="post">
+<form method="post" id="test_question">
     {% csrf_token %}
 
     {% for field in form.fields %}
@@ -43,7 +43,11 @@ Question
         {{ field }}
     </p>
     {% endfor %}
-    <button type="submit" name="previous">PREVIOUS</button>
-    <button type="submit" name="next">NEXT</button>
+    {% if counter > 0 %}
+        <button type="submit" name="previous" form="test_question">PREVIOUS</button>
+    {% endif %}
+    {% if counter < quantity|add:"-1" %}
+        <button type="submit" name="next" form="test_question">NEXT</button>
+    {% endif %}
 </form>
 {% endblock %}

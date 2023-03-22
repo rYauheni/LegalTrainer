@@ -43,4 +43,3 @@ class UserAnswersForm(forms.Form):
     def get_answers_fields(self):
         for field_name in self.fields:
             yield self[field_name]
-

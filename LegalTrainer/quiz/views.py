@@ -123,7 +123,7 @@ def get_question(request, q_number):
     test = Test.objects.get(usertestmodel=user_test)
     questions = test.questions.all()
     question = questions[counter]
-    answers = Answer.objects.filter(question=question)
+    answers = Answer.objects.filter(question=question).order_by('?')
 
     #################
     form = UserAnswersForm(answers=answers)
@@ -137,17 +137,18 @@ def get_question(request, q_number):
             'question': question,
             'answers': answers,
             'counter': counter,
+            'quantity': QUESTIONS_QUANTITY,
             'form': form,
         })
     elif request.method == 'POST':
-        form = UserAnswersForm(request.POST)
+        form = UserAnswersForm(request.POST, answers=answers)
+        print(f"===={form.cleaned_data['answers']}")
         if 0 <= counter < QUESTIONS_QUANTITY - 1:
             url = reverse('question_url', args=(q_number,))
             if form.is_valid():
-                if 'previous' in request.POST:
-                    if user_test.counter > 0:
-                        user_test.counter -= 1
-                        user_test.save()
+                if 'previous' in request.POST:  # КНОПКА PREVIOUS срабатывает корректно на последнем вопросе теста, т.к. попадает в блок ELIF
+                    user_test.counter -= 1
+                    user_test.save()
                     q_number = user_test.counter
                     url = reverse('question_url', args=(q_number,))
                 elif 'next' in request.POST:
