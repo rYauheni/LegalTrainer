@@ -1,0 +1,16 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}
+Test Result
+{% endblock %}
+
+{% block content %}
+<h1>Test Result:</h1>
+<h2>{{ success_questions }} / {{ quantity_questions }} (correctness: {{ correctness_percent }} %)</h2>
+
+
+{% for key, value in full_result.items %}
+    <p>{{ key }}: {{ value }}</p>
+{% endfor %}
+
+{% endblock %}

@@ -37,17 +37,17 @@ Question
 <form method="post" id="test_question">
     {% csrf_token %}
 
-    {% for field in form.fields %}
-    <p>
-        <input type="checkbox" value="{{item.id}}" name="answers">
-        {{ field }}
-    </p>
-    {% endfor %}
+    {{ form.as_p }}
+
     {% if counter > 0 %}
         <button type="submit" name="previous" form="test_question">PREVIOUS</button>
     {% endif %}
     {% if counter < quantity|add:"-1" %}
         <button type="submit" name="next" form="test_question">NEXT</button>
+    {% endif %}
+    <br>
+    {% if counter == quantity|add:"-1" %}
+        <button type="submit" name="end" form="test_question">SHOW RESULT</button>
     {% endif %}
 </form>
 {% endblock %}

@@ -9,7 +9,7 @@ from django.db.models import Max, Count
 
 from random import shuffle, choice, choices
 
-from .models import Category, Question, Answer, Test, UserTestModel, TestAnswer
+from .models import Category, Question, Answer, Test, UserTestModel, UserTestAnswer
 from .forms import RegisterUserForm, LoginUserForm, UserAnswersForm
 from .utils import QUESTIONS_QUANTITY
 
@@ -94,6 +94,9 @@ def set_test(request, slug_category):
     user_test = UserTestModel(user=request.user, test=test, counter=0)
     user_test.save()
     #################################################################
+    #################
+    UserTestAnswer(user_test=user_test).save()
+
     return render(request, 'quiz/CHECK_TEST.html', context={
         'questions': questions,
         'answers': answers
@@ -125,6 +128,7 @@ def get_question(request, q_number):
     question = questions[counter]
     answers = Answer.objects.filter(question=question).order_by('?')
 
+
     #################
     form = UserAnswersForm(answers=answers)
     #################
@@ -142,8 +146,20 @@ def get_question(request, q_number):
         })
     elif request.method == 'POST':
         form = UserAnswersForm(request.POST, answers=answers)
-        print(f"===={form.cleaned_data['answers']}")
-        if 0 <= counter < QUESTIONS_QUANTITY - 1:
+
+        form.full_clean()
+        id_user_answers = form.cleaned_data
+        print(id_user_answers)
+        #################
+        user_test_answers = UserTestAnswer.objects.get(user_test=user_test)
+        for id_a in id_user_answers['answers']:
+            user_test_answers.user_answers.add(Answer.objects.get(id=id_a))
+
+
+
+        #################
+
+        if 0 <= counter <= QUESTIONS_QUANTITY - 1:
             url = reverse('question_url', args=(q_number,))
             if form.is_valid():
                 if 'previous' in request.POST:  # КНОПКА PREVIOUS срабатывает корректно на последнем вопросе теста, т.к. попадает в блок ELIF
@@ -156,8 +172,43 @@ def get_question(request, q_number):
                     user_test.save()
                     q_number = user_test.counter
                     url = reverse('question_url', args=(q_number,))
-        elif counter == QUESTIONS_QUANTITY - 1:
-            pass  # ЛОГИКА ЗАВЕРШЕНИЯ ТЕСТА
+                elif 'end' in request.POST:
+                    url = reverse('result_url')
+
         else:
             raise ValueError(f'Counter value must be in range(0, {QUESTIONS_QUANTITY})')
         return redirect(url)
+
+
+def show_test_result(request):
+    user_tests = UserTestModel.objects.filter(user=request.user)
+    last_number = len(user_tests) - 1
+    user_test = user_tests[last_number]
+    user_answers = UserTestAnswer.objects.get(user_test=user_test)
+    full_result = {}
+    for u_answer in user_answers.user_answers.all():
+        question = u_answer.question
+        full_result.setdefault(question, {
+            'user_answers': [],
+            'correct_answers': []
+        })
+        full_result[question]['user_answers'].append(u_answer)
+
+        if not full_result[question]['correct_answers']:
+            correct_answers = Answer.objects.filter(question=question)
+            for c_answer in correct_answers:
+                if c_answer.correctness:
+                    full_result[question]['correct_answers'].append(c_answer)
+    quantity_questions = len(full_result)
+    success_questions = 0
+    for key in full_result:
+        if full_result[key]['user_answers'] == full_result[key]['correct_answers']:
+            success_questions += 1
+    correctness_percent = round((100 / quantity_questions * success_questions), 2)
+
+    return render(request, 'quiz/test_result.html', context={
+        'full_result': full_result,
+        'quantity_questions': quantity_questions,
+        'success_questions': success_questions,
+        'correctness_percent': correctness_percent,
+    })

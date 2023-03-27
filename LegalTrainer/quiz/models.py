@@ -53,6 +53,6 @@ class UserTestModel(models.Model):
     counter = models.IntegerField(default=0)
 
 
-class TestAnswer(models.Model):  ##### модель для ответа пользователя на тест
-    test = models.ForeignKey('Test', on_delete=models.CASCADE)
-    answers = models.ManyToManyField('Answer', blank=True)
+class UserTestAnswer(models.Model):  ##### модель для ответа пользователя на тест
+    user_test = models.OneToOneField('UserTestModel', on_delete=models.SET_NULL, null=True, blank=True)
+    user_answers = models.ManyToManyField('Answer', blank=True)
