@@ -22,3 +22,4 @@ apps/bot/venv
 apps/bot/test
 apps/web/venv
 apps/web/vendor/*
+/LegalTrainer/db.sqlite3
