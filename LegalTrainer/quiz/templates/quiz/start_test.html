@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block content %}
+    <h2>Test -- {{ l_test }}</h2>
+    <h2>UserTest -- {{ l_user_test }}</h2>
+    <h2>Category -- {{ category }}</h2>
     <ol>
         {% for question in questions %}
             <li>{{ question }}</li>
@@ -15,5 +18,9 @@
             {% endfor %}
         {% endfor %}
     </ol>
+    <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="start">START</button>
+    </form>
 
 {% endblock %}

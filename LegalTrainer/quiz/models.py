@@ -47,6 +47,12 @@ class Test(models.Model):
     questions = models.ManyToManyField('Question', blank=True)
 
 
+class TestQuestion(models.Model):
+    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField()
+
+
 class UserTestModel(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     test = models.ForeignKey('Test', on_delete=models.CASCADE)

@@ -9,7 +9,7 @@ from django.db.models import Max, Count
 
 from random import shuffle, choice, choices
 
-from .models import Category, Question, Answer, Test, UserTestModel, UserTestAnswer
+from .models import Category, Question, Answer, Test, TestQuestion, UserTestModel, UserTestAnswer
 from .forms import RegisterUserForm, LoginUserForm, UserAnswersForm
 from .utils import QUESTIONS_QUANTITY
 
@@ -17,18 +17,40 @@ from .utils import QUESTIONS_QUANTITY
 # Create your views here.
 
 def index(request):
-    return render(request, 'quiz/index.html')
+    if request.method == 'GET':
+        return render(request, 'quiz/index.html')
+    elif request.method == 'POST':
+        url = reverse('index_url')
+        if 'choose_cat' in request.POST:
+            url = reverse('categories_list_url')
+        return redirect(url)
 
 
-# def choose_category(request):
-#     categories = Category.objects.order_by('title')
-#     return render(request, 'quiz/categories.html', context={'categories': categories})
+def choose_category(request):
+    categories = Category.objects.all().order_by('title')
+    if request.method == 'GET':
+        return render(request, 'quiz/categories.html', context={
+            'categories': categories
+        })
+    elif request.method == 'POST':
+        url = reverse('categories_list_url')
+        for category in categories:
+            if category.title in request.POST:
+                slug_category = category.slug
+                url = reverse('set_test_url', args=(slug_category, ))
+        return redirect(url)
 
 
 class CategoryListView(ListView):
     model = Category
     template_name = 'quiz/categories.html'
     context_object_name = 'categories'
+
+    def post(self, request, *args, **kwargs):
+        url = reverse('categories_list_url')
+
+        print(request.queryset)
+        return redirect(url)
 
 
 # def show_category(request, slug_category):
@@ -72,67 +94,42 @@ def logout_user(request):
 
 
 def set_test(request, slug_category):
-    category_id = Category.objects.get(slug=slug_category)
-    questions = Question.objects.filter(category=category_id)
-    id_list = [question.id for question in questions]
-    shuffle(id_list)
-    if len(id_list) >= QUESTIONS_QUANTITY:
-        id_list = id_list[:QUESTIONS_QUANTITY]
-    questions = questions.filter(id__in=id_list).order_by('?')
-    answers = Answer.objects.filter(question__in=id_list)
-    #################################################################
-    test = Test()
-    test.save()
-    for question in questions:
-        test.questions.add(question)  # Результат упорядоченный
-
-    # test_answer = TestAnswer(test=test)
-    # test_answer.save()
-    # for answer in answers:
-    #     test_answer.answers.add(answer)
-
-    user_test = UserTestModel(user=request.user, test=test, counter=0)
-    user_test.save()
-    #################################################################
-    #################
-    UserTestAnswer(user_test=user_test).save()
-
-    return render(request, 'quiz/CHECK_TEST.html', context={
-        'questions': questions,
-        'answers': answers
-    })
+    if request.method == 'GET':
+        category = Category.objects.get(slug=slug_category)
+        return render(request, 'quiz/start_test.html', context={
+            'category': category,
+        })
+    elif request.method == 'POST':
+        category = Category.objects.get(slug=slug_category)
+        questions = Question.objects.filter(category=category)
+        question_ids = [question.id for question in questions]
+        shuffle(question_ids)
+        if len(question_ids) >= QUESTIONS_QUANTITY:
+            question_ids = question_ids[:QUESTIONS_QUANTITY]
+        test = Test()
+        test.save()
+        for order, question_id in enumerate(question_ids):
+            TestQuestion.objects.create(test=test, question_id=question_id, order=order)  # Результат упорядоченный
+        user_test = UserTestModel(user=request.user, test=test, counter=0)
+        user_test.save()
+        UserTestAnswer(user_test=user_test).save()
+        url = reverse('set_test_url', args=(slug_category,))
+        counter = user_test.counter
+        if 'start' in request.POST:
+            url = reverse('question_url', args=(counter,))
+        return redirect(url)
 
 
 def get_question(request, q_number):
-    # questions = Test.objects.filter(user=request.user)
-    # question, answers = None, None
-    # if questions.aggregate(Count('is_answered')):
-    #     for q in questions:
-    #         if not q.is_answered:
-    #             question = Question.objects.get(content=q.question)
-    #             break
-    #     answers = Answer.objects.filter(question=question.id)
-    # else:
-    #     pass  # ЛОГИКА ЗАВЕРШЕНИЯ ТЕСТА
-    # return render(request, 'quiz/question.html', context={
-    #     'question': question,
-    #     'answers': answers,
-    #     'form': AnswersForm(),
-    # })
     user_tests = UserTestModel.objects.filter(user=request.user)
     last_number = len(user_tests) - 1
     user_test = user_tests[last_number]
     counter = user_test.counter
     test = Test.objects.get(usertestmodel=user_test)
-    questions = test.questions.all()
-    question = questions[counter]
+    questions = test.testquestion_set.all().order_by('order')
+    question = questions[counter].question
     answers = Answer.objects.filter(question=question).order_by('?')
-
-
-    #################
     form = UserAnswersForm(answers=answers)
-    #################
-
     if request.method == 'GET':
         return render(request, 'quiz/question.html', context={
             'user_test': user_test,
@@ -141,7 +138,7 @@ def get_question(request, q_number):
             'question': question,
             'answers': answers,
             'counter': counter,
-            'quantity': QUESTIONS_QUANTITY,
+            'quantity': min(QUESTIONS_QUANTITY, len(questions)),
             'form': form,
         })
     elif request.method == 'POST':
@@ -150,15 +147,9 @@ def get_question(request, q_number):
         form.full_clean()
         id_user_answers = form.cleaned_data
         print(id_user_answers)
-        #################
         user_test_answers = UserTestAnswer.objects.get(user_test=user_test)
         for id_a in id_user_answers['answers']:
             user_test_answers.user_answers.add(Answer.objects.get(id=id_a))
-
-
-
-        #################
-
         if 0 <= counter <= QUESTIONS_QUANTITY - 1:
             url = reverse('question_url', args=(q_number,))
             if form.is_valid():
@@ -205,6 +196,16 @@ def show_test_result(request):
         if full_result[key]['user_answers'] == full_result[key]['correct_answers']:
             success_questions += 1
     correctness_percent = round((100 / quantity_questions * success_questions), 2)
+
+    ############ SAVE TEST RESULT
+
+
+
+
+    ###################
+
+
+
 
     return render(request, 'quiz/test_result.html', context={
         'full_result': full_result,

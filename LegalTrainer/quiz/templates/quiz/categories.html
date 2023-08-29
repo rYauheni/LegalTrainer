@@ -11,6 +11,11 @@
         <li>
             <a href="{% url 'category_url' slug_category=category.slug %}">{{ category }}</a>
         </li>
+        <form method="post">
+            {% csrf_token %}
+             <button type="submit" name="{{ category }}">{{ category }}</button>
+        </form>
+
         {% endfor %}
     </ul>
 {% endblock %}
