@@ -8,6 +8,7 @@ Test Result
 <h1>Test Result:</h1>
 <h2>{{ success_questions }} / {{ quantity_questions }} (correctness: {{ correctness_percent }} %)</h2>
 
+<h2>{{ qs }}</h2>
 
 {% for key, value in full_result.items %}
     <p>{{ key }}: {{ value }}</p>

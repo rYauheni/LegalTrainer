@@ -22,6 +22,12 @@
             {% csrf_token %}
             <button type="submit" name="choose_cat">CHOSE CATEGORY</button>
         </form>
+        <hr>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="profile">Profile</button>
+
+    </form>
     {% else %}
         <p><a href="{% url 'login_url' %}">ВОЙТИ</a></p>
         <p><a href="{% url 'register_url' %}">РЕГИСТРАЦИЯ</a></p>

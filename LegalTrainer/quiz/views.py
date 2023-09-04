@@ -23,6 +23,8 @@ def index(request):
         url = reverse('index_url')
         if 'choose_cat' in request.POST:
             url = reverse('categories_list_url')
+        elif 'profile' in request.POST:
+            url = reverse('profile_url')
         return redirect(url)
 
 
@@ -113,6 +115,10 @@ def set_test(request, slug_category):
         user_test = UserTestModel(user=request.user, test=test, counter=0)
         user_test.save()
         UserTestAnswer(user_test=user_test).save()
+        user_test_questions = test.testquestion_set.order_by('order')
+        for order, user_test_question in enumerate(user_test_questions):
+            user_test_question.order = order
+            user_test_question.save()
         url = reverse('set_test_url', args=(slug_category,))
         counter = user_test.counter
         if 'start' in request.POST:
@@ -175,26 +181,35 @@ def show_test_result(request):
     user_tests = UserTestModel.objects.filter(user=request.user)
     last_number = len(user_tests) - 1
     user_test = user_tests[last_number]
+    user_test_questions = user_test.test.testquestion_set.order_by('order')
+
     user_answers = UserTestAnswer.objects.get(user_test=user_test)
     full_result = {}
-    for u_answer in user_answers.user_answers.all():
-        question = u_answer.question
+
+    for user_test_question in user_test_questions:
+        question = user_test_question.question
+
         full_result.setdefault(question, {
             'user_answers': [],
             'correct_answers': []
         })
-        full_result[question]['user_answers'].append(u_answer)
+
+        user_answers_list = user_answers.user_answers.filter(question=question)
+        for u_answer in user_answers_list:
+            full_result[question]['user_answers'].append(u_answer)
 
         if not full_result[question]['correct_answers']:
-            correct_answers = Answer.objects.filter(question=question)
+            correct_answers = Answer.objects.filter(question=question, correctness=True)
             for c_answer in correct_answers:
-                if c_answer.correctness:
-                    full_result[question]['correct_answers'].append(c_answer)
+                full_result[question]['correct_answers'].append(c_answer)
+
     quantity_questions = len(full_result)
     success_questions = 0
+
     for key in full_result:
         if full_result[key]['user_answers'] == full_result[key]['correct_answers']:
             success_questions += 1
+
     correctness_percent = round((100 / quantity_questions * success_questions), 2)
 
     ############ SAVE TEST RESULT
