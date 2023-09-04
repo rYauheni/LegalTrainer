@@ -22,7 +22,8 @@ from LegalTrainer import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('captcha/', include('captcha.urls')),
-    path('', include('quiz.urls'))
+    path('', include('quiz.urls')),
+    path('', include('userprofile.urls')),
 ]
 
 if settings.DEBUG:

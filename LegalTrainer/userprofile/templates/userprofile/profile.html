@@ -1,0 +1,37 @@
+{% extends 'userprofile/base.html' %}
+
+{% block title %}
+    Profile
+{% endblock %}
+
+{% block content %}
+    <h1>Profile</h1>
+    <h2>Content_temp</h2>
+
+    {% if user.is_authenticated %}
+        <h3>Вы авторизованы как {{ user.username }}</h3>
+        <h3>Ваш адрес электронной почты {{ user.email }}</h3>
+    {% else %}
+        <h3>Вы не авторизованы</h3>
+    {% endif %}
+
+    <br><br>
+
+    {% if user.is_authenticated %}
+        <p>{{ user.username }} <a href="{% url 'logout_url' %}">ВЫЙТИ</a></p>
+        <hr>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="change_pd">Change pdata</button>
+        </form>
+        <hr>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="change_pw">Change password</button>
+        </form>
+        <hr>
+    {% else %}
+        <p><a href="{% url 'login_url' %}">ВОЙТИ</a></p>
+        <p><a href="{% url 'register_url' %}">РЕГИСТРАЦИЯ</a></p>
+    {% endif %}
+{% endblock %}
