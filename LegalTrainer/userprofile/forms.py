@@ -17,6 +17,21 @@ class UserProfileForm(forms.ModelForm):
             raise forms.ValidationError('Пароль обязателен для изменения логина или email.')
         return password
 
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        username = cleaned_data.get('username')
+        email = cleaned_data.get('email')
+
+        if (username or email) and not password:
+            raise forms.ValidationError('Пароль обязателен для изменения логина или email.')
+
+        user = self.instance
+
+        if password:
+            if not user.check_password(password):
+                raise forms.ValidationError('Неверный пароль.')
+
 
 class UserPasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(

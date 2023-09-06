@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import update_session_auth_hash
 from django.urls import reverse_lazy, reverse
+from django.core.exceptions import ValidationError
 
 from .forms import UserProfileForm, UserPasswordChangeForm
 
@@ -22,19 +23,33 @@ def show_profile(request):
 
 def change_profile_data(request):
     user = request.user
+    user_data = {'username': user.username, 'email': user.email}
     if request.method == 'GET':
         form = UserProfileForm(instance=user)
         return render(request, 'userprofile/change_profile_data.html', context={
             'form': form,
+            'user_data': user_data,
         })
     elif request.method == 'POST':
         form = UserProfileForm(request.POST, instance=user)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Профиль успешно обновлен.')
-            return redirect('change_pd_success_url')
+            if form.cleaned_data['password']:
+                if not user.check_password(form.cleaned_data['password']):
+                    form.add_error('password', 'Неверный пароль.')
+                    return render(request, 'userprofile/change_profile_data.html', context={
+                        'form': form,
+                        'user_data': user_data,
+                    })
+                else:
+                    form.save()
+                    update_session_auth_hash(request, user)
+                    messages.success(request, 'Профиль успешно обновлен.')
+                    return redirect('change_pd_success_url')
         else:
-            return redirect('change_pd_url')
+            return render(request, 'userprofile/change_profile_data.html', context={
+                'form': form,
+                'user_data': user_data,
+            })
 
 
 def get_change_pd_success(request):

@@ -8,7 +8,8 @@
     <h1>Change profile data</h1>
 
     {% if user.is_authenticated %}
-        <h3> Вы авторизованы как {{ user.username }}</h3>
+        <h3> Вы авторизованы как {{ user_data.username }}</h3>
+        <h3> Ваш email: {{ user_data.email }}</h3>
     {% else %}
         <h3>Вы не авторизованы</h3>
     {% endif %}
@@ -16,7 +17,7 @@
     <br><br>
 
     {% if user.is_authenticated %}
-        <p>{{ user.username }} <a href="{% url 'logout_url' %}">ВЫЙТИ</a></p>
+        <p>{{ user_data.username }} <a href="{% url 'logout_url' %}">ВЫЙТИ</a></p>
         <hr>
         <hr>
         <form method="post">
