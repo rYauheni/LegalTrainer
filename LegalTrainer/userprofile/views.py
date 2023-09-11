@@ -6,6 +6,8 @@ from django.core.exceptions import ValidationError
 
 from .forms import UserProfileForm, UserPasswordChangeForm
 
+from quiz.models import Answer, Test, UserTestModel, UserTestAnswer
+
 
 # Create your views here.
 
@@ -73,3 +75,32 @@ def change_password(request):
 
 def get_change_pw_success(request):
     return render(request, 'userprofile/change_pw_success.html')
+
+
+def show_history(request):
+    user_tests = UserTestModel.objects.filter(user=request.user).order_by('-id')
+    user_results = []
+    for user_test in user_tests:
+        user_test_questions = user_test.test.testquestion_set.order_by('order')
+        user_answers = UserTestAnswer.objects.get(user_test=user_test)
+        test_result = {}
+        for user_test_question in user_test_questions:
+            question = user_test_question.question
+
+            test_result.setdefault(question, {
+                'user_answers': [],
+                'correct_answers': []
+            })
+            user_answers_list = user_answers.user_answers.filter(question=question)
+            for u_answer in user_answers_list:
+                test_result[question]['user_answers'].append(u_answer)
+
+            if not test_result[question]['correct_answers']:
+                correct_answers = Answer.objects.filter(question=question, correctness=True)
+                for c_answer in correct_answers:
+                    test_result[question]['correct_answers'].append(c_answer)
+        user_results.append(test_result)
+    len_results = len(user_results)
+    user_results = [(len_results - i, user_results[i]) for i in range(len_results)]
+    return render(request, 'userprofile/history.html', context={'user_results': user_results})
+

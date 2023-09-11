@@ -15,25 +15,18 @@
         <h3>Вы не авторизованы</h3>
     {% endif %}
 
-    <br>
-    <hr>
-    <a href="{% url 'history_url' %}">HISTORY</a>
-    <hr>
-    <br>
+    <br><br>
 
     {% if user.is_authenticated %}
-        <p>{{ user.username }} <a href="{% url 'logout_url' %}">ВЫЙТИ</a></p>
-        <hr>
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" name="change_pd">Change pdata</button>
-        </form>
-        <hr>
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" name="change_pw">Change password</button>
-        </form>
-        <hr>
+        {% for result in user_results %}
+            <h3>Test # {{ result.0 }}</h3>
+            {% for key, value in result.1.items %}
+                <p>{{ key }}: {{ value }}</p>
+            {% endfor %}
+            <hr>
+        {% empty %}
+            <p>Вы не прошли ещё ни одного теста</p>
+        {% endfor %}
     {% else %}
         <p><a href="{% url 'login_url' %}">ВОЙТИ</a></p>
         <p><a href="{% url 'register_url' %}">РЕГИСТРАЦИЯ</a></p>
