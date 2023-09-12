@@ -5,8 +5,9 @@ from django.urls import reverse_lazy, reverse
 from django.core.exceptions import ValidationError
 
 from .forms import UserProfileForm, UserPasswordChangeForm
+from .utils import show_pie_histogram
 
-from quiz.models import Answer, Test, UserTestModel, UserTestAnswer
+from quiz.models import Category, Answer, Test, UserTestModel, UserTestAnswer
 
 
 # Create your views here.
@@ -104,3 +105,41 @@ def show_history(request):
     user_results = [(len_results - i, user_results[i]) for i in range(len_results)]
     return render(request, 'userprofile/history.html', context={'user_results': user_results})
 
+
+def show_stat(request):
+    user_tests = UserTestModel.objects.filter(user=request.user)
+    total_tests = user_tests.count()
+    total_questions = 0
+    correct_questions = 0
+    incorrect_questions = 0
+    categories = Category.objects.all()
+    categories_stat = {category.title: {'questions': 0, 'correct': 0, 'incorrect': 0} for category in categories}
+    for user_test in user_tests:
+        user_test_questions = user_test.test.testquestion_set.order_by('order')
+        total_questions += user_test_questions.count()
+        total_user_answers = UserTestAnswer.objects.get(user_test=user_test)
+        for user_test_question in user_test_questions:
+            question = user_test_question.question
+            question_category = question.category.title
+            categories_stat[question_category]['questions'] += 1
+            correct_answers = [c_a for c_a in Answer.objects.filter(question=question, correctness=True)]
+            user_answers_list = total_user_answers.user_answers.filter(question=question)
+            user_answers = []
+            for u_answer in user_answers_list:
+                user_answers.append(u_answer)
+            if user_answers == correct_answers:
+                correct_questions += 1
+                categories_stat[question_category]['correct'] += 1
+            else:
+                incorrect_questions += 1
+                categories_stat[question_category]['incorrect'] += 1
+    pie_url = show_pie_histogram(correct_questions, incorrect_questions)
+    return render(request, 'userprofile/stat.html', context={
+        'total_tests': total_tests,
+        'total_questions': total_questions,
+        'correct_questions': correct_questions,
+        'incorrect_questions': incorrect_questions,
+        'pie_url': pie_url,
+        'categories_stat': categories_stat,
+
+    })

@@ -23,3 +23,4 @@ apps/bot/test
 apps/web/venv
 apps/web/vendor/*
 /LegalTrainer/db.sqlite3
+/LegalTrainer/media/
