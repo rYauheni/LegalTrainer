@@ -5,7 +5,7 @@ from django.urls import reverse_lazy, reverse
 from django.core.exceptions import ValidationError
 
 from .forms import UserProfileForm, UserPasswordChangeForm
-from .utils import show_pie_histogram
+from .utils import show_pie_histogram, show_bar_histogram
 
 from quiz.models import Category, Answer, Test, UserTestModel, UserTestAnswer
 
@@ -113,7 +113,8 @@ def show_stat(request):
     correct_questions = 0
     incorrect_questions = 0
     categories = Category.objects.all()
-    categories_stat = {category.title: {'questions': 0, 'correct': 0, 'incorrect': 0} for category in categories}
+    categories_stat = {category.title: {'questions': 0, 'correct': 0, 'incorrect': 0, 'pie_url': ''} for category in
+                       categories}
     for user_test in user_tests:
         user_test_questions = user_test.test.testquestion_set.order_by('order')
         total_questions += user_test_questions.count()
@@ -133,13 +134,19 @@ def show_stat(request):
             else:
                 incorrect_questions += 1
                 categories_stat[question_category]['incorrect'] += 1
-    pie_url = show_pie_histogram(correct_questions, incorrect_questions)
+    for cat in categories_stat:
+        categories_stat[cat]['pie_url'] = show_pie_histogram(categories_stat[cat]['correct'],
+                                                             categories_stat[cat]['incorrect'])
+    total_pie_url = show_pie_histogram(correct_questions, incorrect_questions)
+    total_bar_url = show_bar_histogram(labels=tuple(cat for cat in categories_stat),
+                                       vals=tuple(v['questions'] for v in categories_stat.values()))
     return render(request, 'userprofile/stat.html', context={
         'total_tests': total_tests,
         'total_questions': total_questions,
         'correct_questions': correct_questions,
         'incorrect_questions': incorrect_questions,
-        'pie_url': pie_url,
+        'total_pie_url': total_pie_url,
+        'total_bar_url': total_bar_url,
         'categories_stat': categories_stat,
 
     })

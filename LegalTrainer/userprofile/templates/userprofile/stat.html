@@ -29,13 +29,16 @@
         'incorrect_questions': {{ incorrect_questions }}
         <hr>
         <h3>PIE_H</h3>
-        <img src="{{ pie_url }}" alt="Pie Histogram">
+        <img src="{{ total_pie_url }}" alt="Pie Histogram">
         <hr>
+        <h3>BAR_H</h3>
+        <img src="{{ total_bar_url }}" alt="Bar Histogram">
         {% for category, stats in categories_stat.items %}
             <h3>Category: {{ category }}</h3>
             <p>Total: {{ stats.questions }}</p>
             <p>Correct: {{ stats.correct }}</p>
             <p>Incorrect: {{ stats.incorrect }}</p>
+            <img src="{{ stats.pie_url }}" alt="Pie Histogram">
         {% endfor %}
         <hr>
     {% else %}
