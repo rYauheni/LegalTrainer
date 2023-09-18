@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 
 from .forms import UserProfileForm, UserPasswordChangeForm
 from .utils import show_pie_histogram, show_bar_histogram
+from .tasks import cleanup_old_images
 
 from quiz.models import Category, Answer, Test, UserTestModel, UserTestAnswer
 
@@ -107,6 +108,7 @@ def show_history(request):
 
 
 def show_stat(request):
+    cleanup_old_images()
     user_tests = UserTestModel.objects.filter(user=request.user)
     total_tests = user_tests.count()
     total_questions = 0
