@@ -1,7 +1,10 @@
 import os
 import uuid
+import matplotlib
 import matplotlib.pyplot as plt
 from django.conf import settings
+
+matplotlib.use('agg')
 
 
 def show_pie_histogram(correct: int, incorrect: int) -> str:
@@ -13,10 +16,9 @@ def show_pie_histogram(correct: int, incorrect: int) -> str:
     ax.pie(vals, labels=labels)
     filename = str(uuid.uuid4()) + '.png'
     filepath = os.path.join('media', filename)
-    print('filepath', filepath)
     plt.savefig(filepath, format='png')
+    plt.close()
     file_url = settings.MEDIA_URL + filename
-    print('file_url', file_url)
     return file_url
 
 
@@ -25,8 +27,7 @@ def show_bar_histogram(vals: tuple, labels: tuple) -> str:
     ax.bar(labels, vals)
     filename = str(uuid.uuid4()) + '.png'
     filepath = os.path.join('media', filename)
-    print('filepath', filepath)
     plt.savefig(filepath, format='png')
+    plt.close()
     file_url = settings.MEDIA_URL + filename
-    print('file_url', file_url)
     return file_url
