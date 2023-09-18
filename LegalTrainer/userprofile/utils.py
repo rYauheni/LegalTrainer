@@ -3,13 +3,15 @@ import uuid
 import matplotlib
 import matplotlib.pyplot as plt
 from django.conf import settings
+from django.templatetags.static import static
 
 matplotlib.use('agg')
 
 
 def show_pie_histogram(correct: int, incorrect: int) -> str:
     if correct == 0 and incorrect == 0:
-        return ''  #### добавить обработчик на случай если оба значения 0 (иначе вызывается исключение)
+        placeholder_image_path = static('img/his_placeholder.png')
+        return placeholder_image_path  #### добавить обработчик на случай если оба значения 0 (иначе вызывается исключение)
     vals = [correct, incorrect]
     labels = ['correct', 'incorrect']
     fig, ax = plt.subplots()
