@@ -13,6 +13,7 @@ from .models import Category, Question, Answer, Test, TestQuestion, UserTestMode
 from .forms import RegisterUserForm, LoginUserForm, UserAnswersForm
 from .utils import QUESTIONS_QUANTITY
 
+from userprofile.models import UserStat
 
 # Create your views here.
 
@@ -182,6 +183,7 @@ def show_test_result(request):
     last_number = len(user_tests) - 1
     user_test = user_tests[last_number]
     user_test_questions = user_test.test.testquestion_set.order_by('order')
+    category = user_test_questions[0].question.category
 
     user_answers = UserTestAnswer.objects.get(user_test=user_test)
     full_result = {}
@@ -212,9 +214,12 @@ def show_test_result(request):
 
     correctness_percent = round((100 / quantity_questions * success_questions), 2)
 
-    ############ SAVE TEST RESULT
+    ############ SAVE TEST RESULT IN STAT
 
-
+    user_stat, created = UserStat.objects.get_or_create(user=request.user, category=category)
+    user_stat.correct += success_questions
+    user_stat.incorrect += quantity_questions-success_questions
+    user_stat.save()
 
 
     ###################

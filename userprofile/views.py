@@ -4,12 +4,15 @@ from django.contrib.auth import update_session_auth_hash
 from django.urls import reverse_lazy, reverse
 from django.core.exceptions import ValidationError
 
+from .models import UserStat
 from .forms import UserProfileForm, UserPasswordChangeForm
 from .utils import show_pie_histogram, show_bar_histogram
 from .tasks import cleanup_old_images
 
 from quiz.models import Category, Answer, Test, UserTestModel, UserTestAnswer
 
+
+import time
 
 # Create your views here.
 
@@ -107,6 +110,60 @@ def show_history(request):
     return render(request, 'userprofile/history.html', context={'user_results': user_results})
 
 
+# def show_stat(request):
+#     p1 = time.time()
+#     cleanup_old_images()
+#     user_tests = UserTestModel.objects.filter(user=request.user)
+#     total_tests = user_tests.count()
+#     total_questions = 0
+#     correct_questions = 0
+#     incorrect_questions = 0
+#     categories = Category.objects.all()
+#     categories_stat = {category.title: {'questions': 0, 'correct': 0, 'incorrect': 0, 'his_pie': ''} for category in
+#                        categories}
+#     p2 = time.time()
+#     for user_test in user_tests:
+#         user_test_questions = user_test.test.testquestion_set.order_by('order')
+#         total_questions += user_test_questions.count()
+#         total_user_answers = UserTestAnswer.objects.get(user_test=user_test)
+#         for user_test_question in user_test_questions:
+#             question = user_test_question.question
+#             question_category = question.category.title
+#             categories_stat[question_category]['questions'] += 1
+#             correct_answers = [c_a for c_a in Answer.objects.filter(question=question, correctness=True)]
+#             user_answers_list = total_user_answers.user_answers.filter(question=question)
+#             user_answers = []
+#             for u_answer in user_answers_list:
+#                 user_answers.append(u_answer)
+#             if user_answers == correct_answers:
+#                 correct_questions += 1
+#                 categories_stat[question_category]['correct'] += 1
+#             else:
+#                 incorrect_questions += 1
+#                 categories_stat[question_category]['incorrect'] += 1
+#     p3 = time.time()
+#     for cat in categories_stat:
+#         categories_stat[cat]['his_pie'] = show_pie_histogram(categories_stat[cat]['correct'],
+#                                                              categories_stat[cat]['incorrect'])
+#     p4 = time.time()
+#     total_his_pie = show_pie_histogram(correct_questions, incorrect_questions)
+#     total_his_bar = show_bar_histogram(labels=tuple(cat for cat in categories_stat),
+#                                        vals=tuple(v['questions'] for v in categories_stat.values()))
+#     p5 = time.time()
+#     with open('check_speed.py', 'a+') as f:
+#         f.write(f'{request.user} - {p1, p2, p3, p4, p5}\n')
+#     return render(request, 'userprofile/stat.html', context={
+#         'total_tests': total_tests,
+#         'total_questions': total_questions,
+#         'correct_questions': correct_questions,
+#         'incorrect_questions': incorrect_questions,
+#         'total_his_pie': total_his_pie,
+#         'total_his_bar': total_his_bar,
+#         'categories_stat': categories_stat,
+#
+#     })
+
+
 def show_stat(request):
     cleanup_old_images()
     user_tests = UserTestModel.objects.filter(user=request.user)
@@ -117,38 +174,36 @@ def show_stat(request):
     categories = Category.objects.all()
     categories_stat = {category.title: {'questions': 0, 'correct': 0, 'incorrect': 0, 'his_pie': ''} for category in
                        categories}
-    for user_test in user_tests:
-        user_test_questions = user_test.test.testquestion_set.order_by('order')
-        total_questions += user_test_questions.count()
-        total_user_answers = UserTestAnswer.objects.get(user_test=user_test)
-        for user_test_question in user_test_questions:
-            question = user_test_question.question
-            question_category = question.category.title
-            categories_stat[question_category]['questions'] += 1
-            correct_answers = [c_a for c_a in Answer.objects.filter(question=question, correctness=True)]
-            user_answers_list = total_user_answers.user_answers.filter(question=question)
-            user_answers = []
-            for u_answer in user_answers_list:
-                user_answers.append(u_answer)
-            if user_answers == correct_answers:
-                correct_questions += 1
-                categories_stat[question_category]['correct'] += 1
-            else:
-                incorrect_questions += 1
-                categories_stat[question_category]['incorrect'] += 1
-    for cat in categories_stat:
-        categories_stat[cat]['his_pie'] = show_pie_histogram(categories_stat[cat]['correct'],
-                                                             categories_stat[cat]['incorrect'])
+
+    #####  NEW
+
+    user_stats = UserStat.objects.filter(user=request.user)
+    for stat in user_stats:
+        category = stat.category.title
+        correct = stat.correct
+        incorrect = stat.incorrect
+        questions = correct + incorrect
+        total_questions += questions
+        correct_questions += correct
+        incorrect_questions += incorrect
+        categories_stat[category]['questions'] += questions
+        categories_stat[category]['correct'] += correct
+        categories_stat[category]['incorrect'] += incorrect
+        categories_stat[category]['his_pie'] += show_pie_histogram(categories_stat[category]['correct'],
+                                                                   categories_stat[category]['incorrect'])
+
+    ####
+
     total_his_pie = show_pie_histogram(correct_questions, incorrect_questions)
     total_his_bar = show_bar_histogram(labels=tuple(cat for cat in categories_stat),
                                        vals=tuple(v['questions'] for v in categories_stat.values()))
     return render(request, 'userprofile/stat.html', context={
-        'total_tests': total_tests,
-        'total_questions': total_questions,
-        'correct_questions': correct_questions,
-        'incorrect_questions': incorrect_questions,
-        'total_his_pie': total_his_pie,
-        'total_his_bar': total_his_bar,
-        'categories_stat': categories_stat,
+            'total_tests': total_tests,
+            'total_questions': total_questions,
+            'correct_questions': correct_questions,
+            'incorrect_questions': incorrect_questions,
+            'total_his_pie': total_his_pie,
+            'total_his_bar': total_his_bar,
+            'categories_stat': categories_stat,
 
     })
