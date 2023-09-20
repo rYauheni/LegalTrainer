@@ -1,21 +1,20 @@
-from django.contrib.auth import logout, login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.views import LoginView
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, ListView, DetailView
+from django.views.generic import ListView, DetailView
 from django.db.models import Max, Count
 
 from random import shuffle, choice, choices
 
 from .models import Category, Question, Answer, Test, TestQuestion, UserTestModel, UserTestAnswer
-from .forms import RegisterUserForm, LoginUserForm, UserAnswersForm
+from .forms import UserAnswersForm
 from .utils import QUESTIONS_QUANTITY
 
 from userprofile.models import UserStat
 
 # Create your views here.
+
 
 def index(request):
     if request.method == 'GET':
@@ -68,32 +67,7 @@ class CategoryDetailView(DetailView):
     context_object_name = 'category'
 
 
-class RegisterUser(CreateView):
-    form_class = RegisterUserForm
-    template_name = 'quiz/register.html'
-    success_url = reverse_lazy('reg_success_url')
 
-    def form_valid(self, form):
-        user = form.save()
-        login(self.request, user)
-        return redirect('reg_success_url')
-
-
-def get_register_success(request):
-    return render(request, 'quiz/reg_success.html')
-
-
-class LoginUser(LoginView):
-    form_class = LoginUserForm
-    template_name = 'quiz/login.html'
-
-    def get_success_url(self):
-        return reverse_lazy('index_url')
-
-
-def logout_user(request):
-    logout(request)
-    return redirect('login_url')
 
 
 def set_test(request, slug_category):

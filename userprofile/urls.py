@@ -3,6 +3,11 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('register', views.RegisterUser.as_view(), name='register_url'),
+    path('register/success', views.get_register_success, name='reg_success_url'),
+    path('login', views.LoginUser.as_view(), name='login_url'),
+    path('logout', views.logout_user, name='logout_url'),
+
     path('profile', views.show_profile, name='profile_url'),
 
     path('profile/change-pdata', views.change_profile_data, name='change_pd_url'),

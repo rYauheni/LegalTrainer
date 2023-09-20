@@ -1,11 +1,13 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import login, logout, update_session_auth_hash
+from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy, reverse
 from django.core.exceptions import ValidationError
+from django.views.generic import CreateView
 
 from .models import UserStat
-from .forms import UserProfileForm, UserPasswordChangeForm
+from .forms import RegisterUserForm, LoginUserForm, UserProfileForm, UserPasswordChangeForm
 from .utils import show_pie_histogram, show_bar_histogram
 from .tasks import cleanup_old_images
 
@@ -15,6 +17,35 @@ from quiz.models import Category, Answer, Test, UserTestModel, UserTestAnswer
 import time
 
 # Create your views here.
+
+
+class RegisterUser(CreateView):
+    form_class = RegisterUserForm
+    template_name = 'userprofile/register.html'
+    success_url = reverse_lazy('reg_success_url')
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('reg_success_url')
+
+
+def get_register_success(request):
+    return render(request, 'userprofile/reg_success.html')
+
+
+class LoginUser(LoginView):
+    form_class = LoginUserForm
+    template_name = 'userprofile/login.html'
+
+    def get_success_url(self):
+        return reverse_lazy('index_url')
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('login_url')
+
 
 def show_profile(request):
     if request.method == 'GET':
@@ -76,6 +107,10 @@ def change_password(request):
             update_session_auth_hash(request, form.user)  # Обновление хеша сессии
             messages.success(request, 'Пароль успешно изменен.')
             return redirect('change_pw_success_url')
+        else:
+            return render(request, 'userprofile/change_password.html', context={
+                'form': form,
+            })
 
 
 def get_change_pw_success(request):

@@ -1,4 +1,4 @@
-{% extends 'quiz/base.html' %}
+{% extends 'userprofile/base.html' %}
 {% load static %}
 
 {% block title %}
@@ -13,9 +13,9 @@
 
     <!--    CAPTCHA RELOAD BUTTON-->
     <script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
-    <script type="text/javascript" src="{% static 'quiz/js/captcha.js' %}"></script>
+    <script type="text/javascript" src="{% static 'userprofile/js/captcha.js' %}"></script>
     <button class='captcha-refresh'>
-        <img src="{% static 'quiz/img/reload.png' %}">
+        <img src="{% static 'userprofile/img/reload.png' %}">
     </button>
 
     <button type="submit">Зарегистрировать</button>
