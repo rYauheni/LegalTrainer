@@ -4,7 +4,7 @@ from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy, reverse
 from django.core.exceptions import ValidationError
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView, DetailView
 
 from .models import UserStat
 from .forms import RegisterUserForm, LoginUserForm, UserProfileForm, UserPasswordChangeForm
@@ -117,32 +117,114 @@ def get_change_pw_success(request):
     return render(request, 'userprofile/change_pw_success.html')
 
 
-def show_history(request):
-    user_tests = UserTestModel.objects.filter(user=request.user).order_by('-id')
-    user_results = []
-    for user_test in user_tests:
-        user_test_questions = user_test.test.testquestion_set.order_by('order')
-        user_answers = UserTestAnswer.objects.get(user_test=user_test)
-        test_result = {}
-        for user_test_question in user_test_questions:
-            question = user_test_question.question
+# def show_history(request):
+#     user_tests = UserTestModel.objects.filter(user=request.user).order_by('-id')
+#     user_results = []
+#     for user_test in user_tests:
+#         user_test_questions = user_test.test.testquestion_set.order_by('order')
+#         user_answers = UserTestAnswer.objects.get(user_test=user_test)
+#         test_result = {}
+#         for user_test_question in user_test_questions:
+#             question = user_test_question.question
+#
+#             test_result.setdefault(question, {
+#                 'user_answers': [],
+#                 'correct_answers': []
+#             })
+#             user_answers_list = user_answers.user_answers.filter(question=question)
+#             for u_answer in user_answers_list:
+#                 test_result[question]['user_answers'].append(u_answer)
+#
+#             if not test_result[question]['correct_answers']:
+#                 correct_answers = Answer.objects.filter(question=question, correctness=True)
+#                 for c_answer in correct_answers:
+#                     test_result[question]['correct_answers'].append(c_answer)
+#         user_results.append(test_result)
+#     len_results = len(user_results)
+#     user_results = [(len_results - i, user_results[i]) for i in range(len_results)]
+#     return render(request, 'userprofile/history.html', context={'user_results': user_results})
 
-            test_result.setdefault(question, {
-                'user_answers': [],
-                'correct_answers': []
-            })
-            user_answers_list = user_answers.user_answers.filter(question=question)
-            for u_answer in user_answers_list:
-                test_result[question]['user_answers'].append(u_answer)
 
-            if not test_result[question]['correct_answers']:
-                correct_answers = Answer.objects.filter(question=question, correctness=True)
-                for c_answer in correct_answers:
-                    test_result[question]['correct_answers'].append(c_answer)
-        user_results.append(test_result)
-    len_results = len(user_results)
-    user_results = [(len_results - i, user_results[i]) for i in range(len_results)]
-    return render(request, 'userprofile/history.html', context={'user_results': user_results})
+class UserTestHistoryListView(ListView):
+    template_name = 'userprofile/history.html'
+    model = UserTestModel
+    context_object_name = 'user_tests'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return UserTestModel.objects.filter(user=self.request.user).order_by('-id')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Получить список объектов UserTestModel из контекста
+        user_tests = context['user_tests']
+
+        # Создадим список для хранения категорий
+        category_titles = []
+
+        for user_test in user_tests:
+            test = user_test.test  # Получить связанный объект Test
+            first_test_question = test.testquestion_set.first()  # Получить первый объект TestQuestion
+
+            if first_test_question:
+                category_title = first_test_question.question.category.title
+            else:
+                category_title = None  # Обработка случая, если нет вопросов в тесте
+
+            category_titles.append(category_title)
+
+        context['user_test_cats'] = category_titles
+        return context
+
+    # def get_queryset(self):
+    #     user_tests = UserTestModel.objects.filter(user=self.request.user).order_by('-id')
+    #     user_results = []
+    #
+    #     for user_test in user_tests:
+    #         user_test_questions = user_test.test.testquestion_set.order_by('order')
+    #         user_answers = UserTestAnswer.objects.get(user_test=user_test)
+    #         test_result = {}
+    #
+    #         for user_test_question in user_test_questions:
+    #             question = user_test_question.question
+    #             test_result.setdefault(question, {
+    #                 'user_answers': [],
+    #                 'correct_answers': []
+    #             })
+    #             user_answers_list = user_answers.user_answers.filter(question=question)
+    #             for u_answer in user_answers_list:
+    #                 test_result[question]['user_answers'].append(u_answer)
+    #
+    #             if not test_result[question]['correct_answers']:
+    #                 correct_answers = Answer.objects.filter(question=question, correctness=True)
+    #                 for c_answer in correct_answers:
+    #                     test_result[question]['correct_answers'].append(c_answer)
+    #
+    #         user_results.append(test_result)
+    #
+    #     len_results = len(user_results)
+    #     user_results = [(len_results - i, user_results[i]) for i in range(len_results)]
+    #
+    #     return user_results
+
+
+class UserTestDetailView(DetailView):
+    template_name = 'userprofile/history_detail.html'
+    model = UserTestModel
+    context_object_name = 'user_test'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_test = self.get_object()  # Получить текущий объект UserTestModel
+        test = user_test.test  # Получить связанный объект Test
+        first_test_question = test.testquestion_set.first()  # Получить первый объект TestQuestion
+        if first_test_question:
+            category = first_test_question.question.category.title
+        else:
+            category = None  # Обработка случая, если нет вопросов в тесте
+        context['user_test_cat'] = category
+        return context
 
 
 # def show_stat(request):

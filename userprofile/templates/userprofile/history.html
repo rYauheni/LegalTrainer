@@ -16,13 +16,20 @@
     {% endif %}
 
     <br><br>
+<hr>
+{% for c in user_test_cats %}
+    ={{ c }}=
+{% endfor %}
+<hr>
 
     {% if user.is_authenticated %}
-        {% for result in user_results %}
-            <h3>Test # {{ result.0 }}</h3>
-            {% for key, value in result.1.items %}
-                <p>{{ key }}: {{ value }}</p>
-            {% endfor %}
+        {% for user_test in user_tests %}
+            <a href="{% url 'history_detail_url' pk=user_test.id %}">
+                Test # {{ user_test.id }}. {{ user_test.test.testquestion_set.first.question.category.title  }}
+            </a>
+<!--            {% for key, value in result.1.items %}-->
+<!--                <p>{{ key }}: {{ value }}</p>-->
+<!--            {% endfor %}-->
             <hr>
         {% empty %}
             <p>Вы не прошли ещё ни одного теста</p>
@@ -31,4 +38,14 @@
         <p><a href="{% url 'login_url' %}">ВОЙТИ</a></p>
         <p><a href="{% url 'register_url' %}">РЕГИСТРАЦИЯ</a></p>
     {% endif %}
+
+    <nav>
+        <ul>
+            {% for p in paginator.page_range %}
+                <li>
+                    <a href="?page={{ p }}">{{ p }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
 {% endblock %}

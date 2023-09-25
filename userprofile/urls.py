@@ -15,7 +15,8 @@ urlpatterns = [
     path('profile/change-password', views.change_password, name='change_pw_url'),
     path('profile/change-password/success', views.get_change_pw_success, name='change_pw_success_url'),
 
-    path('profile/history', views.show_history, name='history_url'),
+    path('profile/history', views.UserTestHistoryListView.as_view(), name='history_url'),
+    path('profile/history/<int:pk>', views.UserTestDetailView.as_view(), name='history_detail_url'),
 
     path('profile/stat', views.show_stat, name='stat_url'),
 
