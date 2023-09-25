@@ -7,7 +7,7 @@ from django.db.models import Max, Count
 
 from random import shuffle, choice, choices
 
-from .models import Category, Question, Answer, Test, TestQuestion, UserTestModel, UserTestAnswer
+from .models import Category, Question, Answer, Test, TestQuestion, UserTestModel, UserTestAnswer, UserTestResult
 from .forms import UserAnswersForm
 from .utils import QUESTIONS_QUANTITY
 
@@ -187,6 +187,17 @@ def show_test_result(request):
             success_questions += 1
 
     correctness_percent = round((100 / quantity_questions * success_questions), 2)
+
+    ######## SAVE TEST RESULT
+
+    user_test_result = UserTestResult.objects.create(
+        user_test=user_test,
+        user_test_category=category,
+        correct=success_questions,
+        incorrect=quantity_questions-success_questions
+    )
+    user_test_result.save()
+
 
     ############ SAVE TEST RESULT IN STAT
 

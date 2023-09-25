@@ -62,3 +62,10 @@ class UserTestModel(models.Model):
 class UserTestAnswer(models.Model):  ##### модель для ответа пользователя на тест
     user_test = models.OneToOneField('UserTestModel', on_delete=models.SET_NULL, null=True, blank=True)
     user_answers = models.ManyToManyField('Answer', blank=True)
+
+
+class UserTestResult(models.Model):
+    user_test = models.ForeignKey('UserTestModel', on_delete=models.CASCADE)
+    user_test_category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    correct = models.IntegerField(default=0)
+    incorrect = models.IntegerField(default=0)
