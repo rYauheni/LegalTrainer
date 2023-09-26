@@ -17,19 +17,19 @@
 
     <br><br>
 <hr>
-{% for c in user_test_cats %}
-    ={{ c }}=
-{% endfor %}
+{{ user_tests.user_test_results }}
 <hr>
 
     {% if user.is_authenticated %}
-        {% for user_test in user_tests %}
-            <a href="{% url 'history_detail_url' pk=user_test.id %}">
-                Test # {{ user_test.id }}. {{ user_test.test.testquestion_set.first.question.category.title  }}
-            </a>
-<!--            {% for key, value in result.1.items %}-->
-<!--                <p>{{ key }}: {{ value }}</p>-->
-<!--            {% endfor %}-->
+        {% for ut, content in user_tests.items %}
+            {% if content.is_finished %}
+                <a href="{% url 'history_detail_url' pk=ut.id %}">
+                    Test # {{ content.number }}.
+                </a>
+                {{ content.category  }} result: {{ content.correct }}/10
+            {% else %}
+                Test # {{ content.number }}. HAS NOT FINISHED
+            {% endif %}
             <hr>
         {% empty %}
             <p>Вы не прошли ещё ни одного теста</p>

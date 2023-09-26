@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, update_session_auth_hash
@@ -11,7 +12,7 @@ from .forms import RegisterUserForm, LoginUserForm, UserProfileForm, UserPasswor
 from .utils import show_pie_histogram, show_bar_histogram
 from .tasks import cleanup_old_images
 
-from quiz.models import Category, Answer, Test, UserTestModel, UserTestAnswer
+from quiz.models import Category, Answer, Test, UserTestModel, UserTestAnswer, UserTestResult
 
 
 import time
@@ -156,25 +157,53 @@ class UserTestHistoryListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Получить список объектов UserTestModel из контекста
         user_tests = context['user_tests']
+        user_test_results = {user_test: {'is_finished': False, 'category': '', 'correct': 0, 'incorrect': 0, 'number': 0} for user_test in user_tests}
 
-        # Создадим список для хранения категорий
-        category_titles = []
+        page_number = self.request.GET.get('page')
+        page_number = int(page_number) if page_number else 1
+        counter = len(self.get_queryset()) - ((page_number - 1) * self.paginate_by)
 
         for user_test in user_tests:
-            test = user_test.test  # Получить связанный объект Test
-            first_test_question = test.testquestion_set.first()  # Получить первый объект TestQuestion
+            try:
+                user_test_result = UserTestResult.objects.get(user_test=user_test)
+            except UserTestResult.DoesNotExist:
+                user_test_result = 0
+            if user_test_result:
+                category = user_test_result.user_test_category
+                correct = user_test_result.correct
+                incorrect = user_test_result.incorrect
+                user_test_results[user_test]['is_finished'] = True
+                user_test_results[user_test]['category'] = category
+                user_test_results[user_test]['correct'] = correct
+                user_test_results[user_test]['incorrect'] = incorrect
+            user_test_results[user_test]['number'] = counter
+            counter -= 1
 
-            if first_test_question:
-                category_title = first_test_question.question.category.title
-            else:
-                category_title = None  # Обработка случая, если нет вопросов в тесте
+        context['user_tests'] = user_test_results
 
-            category_titles.append(category_title)
+        #     categories_stat = {category.title: {'questions': 0, 'correct': 0, 'incorrect': 0, 'his_pie': ''} for category in
+        #                        categories}
 
-        context['user_test_cats'] = category_titles
+
+        # # Получить список объектов UserTestModel из контекста
+        # user_tests = context['user_tests']
+        #
+        # # Создадим список для хранения категорий
+        # category_titles = []
+        #
+        # for user_test in user_tests:
+        #     test = user_test.test  # Получить связанный объект Test
+        #     first_test_question = test.testquestion_set.first()  # Получить первый объект TestQuestion
+        #
+        #     if first_test_question:
+        #         category_title = first_test_question.question.category.title
+        #     else:
+        #         category_title = None  # Обработка случая, если нет вопросов в тесте
+        #
+        #     category_titles.append(category_title)
+        #
+        # context['user_test_cats'] = category_titles
         return context
 
     # def get_queryset(self):
@@ -216,14 +245,35 @@ class UserTestDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user_test = self.get_object()  # Получить текущий объект UserTestModel
-        test = user_test.test  # Получить связанный объект Test
-        first_test_question = test.testquestion_set.first()  # Получить первый объект TestQuestion
-        if first_test_question:
-            category = first_test_question.question.category.title
-        else:
-            category = None  # Обработка случая, если нет вопросов в тесте
-        context['user_test_cat'] = category
+        user_test = self.get_object()
+        test = user_test.test
+        user_test_questions = test.testquestion_set.order_by('order')
+        user_answers = UserTestAnswer.objects.get(user_test=user_test)
+        user_test_result = UserTestResult.objects.get(user_test=user_test)
+        full_user_test_result = {}
+        for user_test_question in user_test_questions:
+            question = user_test_question.question
+            answers = Answer.objects.filter(question=question)
+
+            full_user_test_result.setdefault(
+                question, {
+                    'answers': answers,
+                    'user_answers': [],
+                    'correct_answers': []
+                }
+            )
+
+            user_answers_list = user_answers.user_answers.filter(question=question)
+            for u_answer in user_answers_list:
+                full_user_test_result[question]['user_answers'].append(u_answer)
+
+            if not full_user_test_result[question]['correct_answers']:
+                correct_answers = Answer.objects.filter(question=question, correctness=True)
+                for c_answer in correct_answers:
+                    full_user_test_result[question]['correct_answers'].append(c_answer)
+
+        context['user_test_result'] = user_test_result
+        context['full_user_test_result'] = full_user_test_result
         return context
 
 
