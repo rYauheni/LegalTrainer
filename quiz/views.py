@@ -164,8 +164,10 @@ def show_test_result(request):
 
     for user_test_question in user_test_questions:
         question = user_test_question.question
+        answers = Answer.objects.filter(question=question)
 
         full_result.setdefault(question, {
+            'answers': answers,
             'user_answers': [],
             'correct_answers': []
         })
@@ -214,7 +216,5 @@ def show_test_result(request):
 
     return render(request, 'quiz/test_result.html', context={
         'full_result': full_result,
-        'quantity_questions': quantity_questions,
-        'success_questions': success_questions,
-        'correctness_percent': correctness_percent,
+        'user_test_result': user_test_result,
     })

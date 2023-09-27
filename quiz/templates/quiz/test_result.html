@@ -6,12 +6,35 @@ Test Result
 
 {% block content %}
 <h1>Test Result:</h1>
-<h2>{{ success_questions }} / {{ quantity_questions }} (correctness: {{ correctness_percent }} %)</h2>
-
-<h2>{{ qs }}</h2>
-
-{% for key, value in full_result.items %}
-    <p>{{ key }}: {{ value }}</p>
-{% endfor %}
+<hr>
+<hr>
+    <h2>Test: {{ user_test_result.user_test }}</h2>
+    <h3>category {{ user_test_result.user_test_category.title }}</h3>
+    <h3>correctness {{ user_test_result.correct }}/{{ full_result|length }} </h3>
+    <h3>q&a:</h3>
+    {% for question, content in full_result.items %}
+        <hr>
+        <p>question: {{ question }}</p>
+        <ul>
+            answers:
+            {% for answer in content.answers %}
+                <li>
+                    {{ answer }}
+                    {% if answer in content.user_answers and answer in content.correct_answers %}
+                        ==GREEN==
+                    {% elif answer not in content.user_answers and answer in content.correct_answers %}
+                        ==YELLOW==
+                    {% elif answer in content.user_answers and answer not in content.correct_answers %}
+                        ==RED==
+                    {% elif answer not in content.user_answers and answer not in content.correct_answers %}
+                        ==GREY==
+                    {% else %}
+                        ==ERRORERRORERROR==
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <hr>
+    {% endfor %}
 
 {% endblock %}
