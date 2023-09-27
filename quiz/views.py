@@ -110,7 +110,11 @@ def get_question(request, q_number):
     questions = test.testquestion_set.all().order_by('order')
     question = questions[counter].question
     answers = Answer.objects.filter(question=question).order_by('?')
-    form = UserAnswersForm(answers=answers)
+
+    user_test_answers = UserTestAnswer.objects.get(user_test=user_test)
+    selected_answers = [str(answer.id) for answer in user_test_answers.user_answers.all()]
+
+    form = UserAnswersForm(answers=answers, initial={'answers': selected_answers})
     if request.method == 'GET':
         return render(request, 'quiz/question.html', context={
             'user_test': user_test,
@@ -129,6 +133,10 @@ def get_question(request, q_number):
         id_user_answers = form.cleaned_data
         print(id_user_answers)
         user_test_answers = UserTestAnswer.objects.get(user_test=user_test)
+
+        for old_answer in user_test_answers.user_answers.filter(question=question):
+            user_test_answers.user_answers.remove(old_answer)
+
         for id_a in id_user_answers['answers']:
             user_test_answers.user_answers.add(Answer.objects.get(id=id_a))
         if 0 <= counter <= QUESTIONS_QUANTITY - 1:
