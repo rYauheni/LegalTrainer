@@ -55,10 +55,6 @@ class CategoryListView(ListView):
         return redirect(url)
 
 
-# def show_category(request, slug_category):
-#     category = get_object_or_404(Category, slug=slug_category)
-#     return render(request, 'quiz/category.html', context={'category': category})
-
 
 class CategoryDetailView(DetailView):
     model = Category
