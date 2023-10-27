@@ -55,15 +55,11 @@ class CategoryListView(ListView):
         return redirect(url)
 
 
-
 class CategoryDetailView(DetailView):
     model = Category
     template_name = 'quiz/category.html'
     slug_url_kwarg = 'slug_category'
     context_object_name = 'category'
-
-
-
 
 
 def set_test(request, slug_category):
