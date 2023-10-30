@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse_lazy, reverse
+from django.views import View
 from django.views.generic import ListView, DetailView
 from django.db.models import Max, Count
 
@@ -16,42 +17,37 @@ from userprofile.models import UserStat
 # Create your views here.
 
 
-def index(request):
-    if request.method == 'GET':
-        return render(request, 'quiz/index.html')
-    elif request.method == 'POST':
+class IndexView(View):
+    template_name = 'quiz/index.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request):
         url = reverse('index_url')
+
         if 'choose_cat' in request.POST:
             url = reverse('categories_list_url')
         elif 'profile' in request.POST:
             url = reverse('profile_url')
+
         return redirect(url)
 
 
-def choose_category(request):
-    categories = Category.objects.all().order_by('title')
-    if request.method == 'GET':
-        return render(request, 'quiz/categories.html', context={
-            'categories': categories
-        })
-    elif request.method == 'POST':
+class ChooseCategoryView(View):
+    def get(self, request):
+        categories = Category.objects.all().order_by('title')
+        return render(request, 'quiz/categories.html', context={'categories': categories})
+
+    def post(self, request):
+        categories = Category.objects.all().order_by('title')
         url = reverse('categories_list_url')
+
         for category in categories:
             if category.title in request.POST:
                 slug_category = category.slug
                 url = reverse('set_test_url', args=(slug_category, ))
-        return redirect(url)
 
-
-class CategoryListView(ListView):
-    model = Category
-    template_name = 'quiz/categories.html'
-    context_object_name = 'categories'
-
-    def post(self, request, *args, **kwargs):
-        url = reverse('categories_list_url')
-
-        print(request.queryset)
         return redirect(url)
 
 
@@ -62,68 +58,88 @@ class CategoryDetailView(DetailView):
     context_object_name = 'category'
 
 
-def set_test(request, slug_category):
-    if request.method == 'GET':
+class SetTestView(View):
+    def get(self, request, slug_category):
         category = Category.objects.get(slug=slug_category)
-        return render(request, 'quiz/start_test.html', context={
-            'category': category,
-        })
-    elif request.method == 'POST':
+        return render(request, 'quiz/start_test.html', context={'category': category})
+
+    def post(self, request, slug_category):
         category = Category.objects.get(slug=slug_category)
         questions = Question.objects.filter(category=category)
         question_ids = [question.id for question in questions]
         shuffle(question_ids)
+
+        QUESTIONS_QUANTITY = 10  # Замените на нужное количество вопросов
+
         if len(question_ids) >= QUESTIONS_QUANTITY:
             question_ids = question_ids[:QUESTIONS_QUANTITY]
+
         test = Test()
         test.save()
+
         for order, question_id in enumerate(question_ids):
-            TestQuestion.objects.create(test=test, question_id=question_id, order=order)  # Результат упорядоченный
+            TestQuestion.objects.create(test=test, question_id=question_id, order=order)
+
         user_test = UserTestModel(user=request.user, test=test, counter=0)
         user_test.save()
         UserTestAnswer(user_test=user_test).save()
+
         user_test_questions = test.testquestion_set.order_by('order')
         for order, user_test_question in enumerate(user_test_questions):
             user_test_question.order = order
             user_test_question.save()
+
         url = reverse('set_test_url', args=(slug_category,))
         counter = user_test.counter
+
         if 'start' in request.POST:
             url = reverse('question_url', args=(counter,))
+
         return redirect(url)
 
 
-def get_question(request, q_number):
-    user_tests = UserTestModel.objects.filter(user=request.user)
-    last_number = len(user_tests) - 1
-    user_test = user_tests[last_number]
-    counter = user_test.counter
-    test = Test.objects.get(usertestmodel=user_test)
-    questions = test.testquestion_set.all().order_by('order')
-    question = questions[counter].question
-    answers = Answer.objects.filter(question=question).order_by('?')
+class GetQuestionView(View):
+    def get(self, request, q_number):
+        user_tests = UserTestModel.objects.filter(user=request.user)
+        last_number = len(user_tests) - 1
+        user_test = user_tests[last_number]
+        counter = user_test.counter
+        test = Test.objects.get(usertestmodel=user_test)
+        questions = test.testquestion_set.all().order_by('order')
+        question = questions[counter].question
+        answers = Answer.objects.filter(question=question).order_by('?')
 
-    user_test_answers = UserTestAnswer.objects.get(user_test=user_test)
-    selected_answers = [str(answer.id) for answer in user_test_answers.user_answers.all()]
+        user_test_answers = UserTestAnswer.objects.get(user_test=user_test)
+        selected_answers = [str(answer.id) for answer in user_test_answers.user_answers.all()]
 
-    form = UserAnswersForm(answers=answers, initial={'answers': selected_answers})
-    if request.method == 'GET':
-        return render(request, 'quiz/question.html', context={
-            'user_test': user_test,
-            'test': test,
-            'questions': questions,
-            'question': question,
-            'answers': answers,
-            'counter': counter,
-            'quantity': min(QUESTIONS_QUANTITY, len(questions)),
-            'form': form,
-        })
-    elif request.method == 'POST':
+        form = UserAnswersForm(answers=answers, initial={'answers': selected_answers})
+
+        if request.method == 'GET':
+            return render(request, 'quiz/question.html', context={
+                'user_test': user_test,
+                'test': test,
+                'questions': questions,
+                'question': question,
+                'answers': answers,
+                'counter': counter,
+                'quantity': min(QUESTIONS_QUANTITY, len(questions)),  # Заменить QUESTIONS_QUANTITY на нужное значение
+                'form': form,
+            })
+
+    def post(self, request, q_number):
+        user_tests = UserTestModel.objects.filter(user=request.user)
+        last_number = len(user_tests) - 1
+        user_test = user_tests[last_number]
+        counter = user_test.counter
+        test = Test.objects.get(usertestmodel=user_test)
+        questions = test.testquestion_set.all().order_by('order')
+        question = questions[counter].question
+        answers = Answer.objects.filter(question=question).order_by('?')
+
         form = UserAnswersForm(request.POST, answers=answers)
 
         form.full_clean()
         id_user_answers = form.cleaned_data
-        print(id_user_answers)
         user_test_answers = UserTestAnswer.objects.get(user_test=user_test)
 
         for old_answer in user_test_answers.user_answers.filter(question=question):
@@ -131,10 +147,11 @@ def get_question(request, q_number):
 
         for id_a in id_user_answers['answers']:
             user_test_answers.user_answers.add(Answer.objects.get(id=id_a))
-        if 0 <= counter <= QUESTIONS_QUANTITY - 1:
+
+        if 0 <= counter <= QUESTIONS_QUANTITY - 1:  # Замените QUESTIONS_QUANTITY на нужное значение
             url = reverse('question_url', args=(q_number,))
             if form.is_valid():
-                if 'previous' in request.POST:  # КНОПКА PREVIOUS срабатывает корректно на последнем вопросе теста, т.к. попадает в блок ELIF
+                if 'previous' in request.POST:
                     user_test.counter -= 1
                     user_test.save()
                     q_number = user_test.counter
@@ -149,6 +166,7 @@ def get_question(request, q_number):
 
         else:
             raise ValueError(f'Counter value must be in range(0, {QUESTIONS_QUANTITY})')
+
         return redirect(url)
 
 
