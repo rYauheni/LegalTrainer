@@ -1,0 +1,38 @@
+.categories-hd {
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    font-weight: bold;
+    font-size: 42px;
+    margin-top: 80px;
+    margin-bottom: 40px;
+}
+
+.categories-list {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    align-items: center;
+
+}
+
+.category-btn {
+    background-color: #1560BD;
+    border-radius: 20px;
+    border: #0ABCEB;
+    float: right;
+    width: 320px;
+    height: 100px;
+    color: white;
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    margin: 10px;
+}
+
+.category-btn:hover {
+    background-color: #3A75C4;
+    color: white;
+    border-radius: 40px;
+    -webkit-box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+    -moz-box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+    box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+}

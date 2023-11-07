@@ -1,21 +1,24 @@
 {% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
     Categories
 {% endblock %}
 
-{% block content %}
-    <h2>Choose category:</h2>
-    <ul>
-        {% for category in categories %}
-        <li>
-            <a href="{% url 'category_url' slug_category=category.slug %}">{{ category }}</a>
-        </li>
-        <form method="post">
-            {% csrf_token %}
-             <button type="submit" name="{{ category }}">{{ category }}</button>
-        </form>
+{% block head %}
+    <link rel="stylesheet" href="{% static 'quiz/css/style_categories.css' %}"/>
+{% endblock %}
 
+{% block content %}
+    <div class="categories">
+    <h1 class="categories-hd">Выберите отрасль права</h1>
+        {% for category in categories %}
+            <div class="categories-list">
+                <form method="post">
+                    {% csrf_token %}
+                     <button class="category-btn" type="submit" name="{{ category }}">{{ category }}</button>
+                </form>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 {% endblock %}

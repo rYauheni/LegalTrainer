@@ -1,35 +1,28 @@
 {% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
     LegalTrainer
 {% endblock %}
 
 {% block content %}
-    <h2>Content_temp</h2>
+    <div class="hero-right col-sm-6 col-sm-6">
+                <h1 class="header-headline bold"> LegalTrainer <br></h1>
+                <h4 class="header-running-text light"> Онлайн тренажёр по различным отраслям права.
+                    Проверь свои знания!</h4>
+                <div>
+                    <form method="post">{% csrf_token %}
+                        {% if user.is_authenticated %}
+                        <button class="hero-btn" type="submit" name="choose_cat">Начать</button>
+                        {% else %}
+                        <button class="hero-btn" type="submit" name="login">Войти</button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div><!--hero-left-->
 
-    {% if user.is_authenticated %}
-        <h3> Вы авторизованы как {{ user.username }}</h3>
-    {% else %}
-        <h3>Вы не авторизованы</h3>
-    {% endif %}
+            <div class="col-sm-6 col-sm-6 ipad">
+                <img class="ipad-screen img-responsive" src="{% static 'quiz/img/book_tree.png' %}"/>
+            </div>
 
-    <br><br>
-
-    {% if user.is_authenticated %}
-        <p>{{ user.username }} <a href="{% url 'logout_url' %}">ВЫЙТИ</a></p>
-        <hr>
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" name="choose_cat">CHOSE CATEGORY</button>
-        </form>
-        <hr>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" name="profile">Profile</button>
-
-    </form>
-    {% else %}
-        <p><a href="{% url 'login_url' %}">ВОЙТИ</a></p>
-        <p><a href="{% url 'register_url' %}">РЕГИСТРАЦИЯ</a></p>
-    {% endif %}
 {% endblock %}
