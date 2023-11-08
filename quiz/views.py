@@ -10,38 +10,36 @@ from random import shuffle, choice, choices
 
 from .models import Category, Question, Answer, Test, TestQuestion, UserTestModel, UserTestAnswer, UserTestResult
 from .forms import UserAnswersForm
-from .utils import QUESTIONS_QUANTITY
+from .utils import BarMixin, QUESTIONS_QUANTITY
 
 from userprofile.models import UserStat
 
 # Create your views here.
 
 
-class IndexView(View):
+class IndexView(BarMixin, View):
     template_name = 'quiz/index.html'
 
     def get(self, request):
         return render(request, self.template_name)
 
     def post(self, request):
-        url = reverse('index_url')
+        url = super().post(request)
 
         if 'choose_cat' in request.POST:
             url = reverse('categories_list_url')
-        elif 'profile' in request.POST:
-            url = reverse('profile_url')
 
         return redirect(url)
 
 
-class ChooseCategoryView(View):
+class ChooseCategoryView(BarMixin, View):
     def get(self, request):
         categories = Category.objects.all().order_by('title')
         return render(request, 'quiz/categories.html', context={'categories': categories})
 
     def post(self, request):
         categories = Category.objects.all().order_by('title')
-        url = reverse('categories_list_url')
+        url = super().post(request)
 
         for category in categories:
             if category.title in request.POST:
@@ -58,10 +56,11 @@ class CategoryDetailView(DetailView):
     context_object_name = 'category'
 
 
-class SetTestView(View):
+class SetTestView(BarMixin, View):
     def get(self, request, slug_category):
         category = Category.objects.get(slug=slug_category)
-        return render(request, 'quiz/start_test.html', context={'category': category})
+        qq = QUESTIONS_QUANTITY
+        return render(request, 'quiz/start_test.html', context={'category': category, 'qq': qq})
 
     def post(self, request, slug_category):
         category = Category.objects.get(slug=slug_category)
@@ -89,16 +88,18 @@ class SetTestView(View):
             user_test_question.order = order
             user_test_question.save()
 
-        url = reverse('set_test_url', args=(slug_category,))
+        url = super().post(request)
         counter = user_test.counter
 
         if 'start' in request.POST:
             url = reverse('question_url', args=(counter,))
+        elif 'cats' in request.POST:
+            url = reverse('categories_list_url')
 
         return redirect(url)
 
 
-class GetQuestionView(View):
+class GetQuestionView(BarMixin, View):
     def get(self, request, q_number):
         user_tests = UserTestModel.objects.filter(user=request.user)
         last_number = len(user_tests) - 1
@@ -142,6 +143,8 @@ class GetQuestionView(View):
         id_user_answers = form.cleaned_data
         user_test_answers = UserTestAnswer.objects.get(user_test=user_test)
 
+        url = super().post(request)
+
         for old_answer in user_test_answers.user_answers.filter(question=question):
             user_test_answers.user_answers.remove(old_answer)
 
@@ -149,7 +152,6 @@ class GetQuestionView(View):
             user_test_answers.user_answers.add(Answer.objects.get(id=id_a))
 
         if 0 <= counter <= QUESTIONS_QUANTITY - 1:  # Замените QUESTIONS_QUANTITY на нужное значение
-            url = reverse('question_url', args=(q_number,))
             if form.is_valid():
                 if 'previous' in request.POST:
                     user_test.counter -= 1
@@ -208,8 +210,6 @@ def show_test_result(request):
 
     correctness_percent = round((100 / quantity_questions * success_questions), 2)
 
-    ######## SAVE TEST RESULT
-
     user_test_result = UserTestResult.objects.create(
         user_test=user_test,
         user_test_category=category,
@@ -218,19 +218,10 @@ def show_test_result(request):
     )
     user_test_result.save()
 
-
-    ############ SAVE TEST RESULT IN STAT
-
     user_stat, created = UserStat.objects.get_or_create(user=request.user, category=category)
     user_stat.correct += success_questions
     user_stat.incorrect += quantity_questions-success_questions
     user_stat.save()
-
-
-    ###################
-
-
-
 
     return render(request, 'quiz/test_result.html', context={
         'full_result': full_result,
