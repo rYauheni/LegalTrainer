@@ -39,10 +39,10 @@
                 <a class="navbar-brand logo" href="/"> <img class="logo" src="{% static 'quiz/img/logo.png' %}"/> LegalTrainer </a>
             </div>
             <div>
-                <form>
+                <form method="post">
                     {% csrf_token %}
                     {% if user.is_authenticated %}
-                        <button class="header-btn" name="logout">Выйти</button>
+                        <button class="header-btn" name="profile">{{ user.username }}</button>
                     {% else %}
                         <button class="header-btn" name="login">Войти</button>
                     {% endif %}
@@ -50,9 +50,7 @@
             </div>
             <div class="header-right">
                 <a class="navbar-item" href="#about">О продукте</a>
-                {% if user.is_authenticated %}
-                    <a class="navbar-item" href="{% url 'profile_url' %}">{{ user.username }}</a>
-                {% endif %}
+
                 </div>
 
         </div>

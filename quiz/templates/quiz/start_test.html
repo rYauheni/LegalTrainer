@@ -1,26 +1,25 @@
 {% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
     Test
 {% endblock %}
 
+{% block head %}
+    <link rel="stylesheet" href="{% static 'quiz/css/style_start_test.css' %}"/>
+{% endblock %}
+
 {% block content %}
-    <h2>Test -- {{ l_test }}</h2>
-    <h2>UserTest -- {{ l_user_test }}</h2>
-    <h2>Category -- {{ category }}</h2>
-    <ol>
-        {% for question in questions %}
-            <li>{{ question }}</li>
-            {% for answer in answers %}
-                {% if question == answer.question %}
-                    <p>{{ answer }}</p>
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-    </ol>
+    <h1 class="st-h1">Вы выбрали тест по теме «{{ category }}»</h1>
+    <h3 class="st-h3">Тест может содержать до {{ qq }} вопросов. У каждого вопроса есть как минимум один правильный ответ.
+        Все ответы на вопрос не могут быть правильными. Верно отвеченным считается тот вопрос,
+        на который даны все верные ответы и не дано ни одного неверного.
+        До завершения теста допускается возврат к ответам на предыдущие вопросы и их изменение.</h3>
+    <h3 class="st-h3">Удачи!</h3>
     <form method="post">
             {% csrf_token %}
-            <button type="submit" name="start">START</button>
+            <button class="start-btn" type="submit" name="start">Начать</button>
+            <button class="cats-btn" type="submit" name="cats">Категории</button>
     </form>
 
 {% endblock %}

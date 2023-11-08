@@ -1,0 +1,55 @@
+.st-h1 {
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    font-weight: bold;
+    font-size: 42px;
+    margin-top: 80px;
+    margin-bottom: 40px;
+}
+
+.st-h3 {
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    font-size: 24px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    max-width: 100%;
+}
+
+button {
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+
+    border-radius: 10px;
+
+    width: 210px;
+    height: 51px;
+    color: white;
+    margin: 30px auto;
+}
+
+button:hover {
+    color: white;
+    border-radius: 20px;
+    -webkit-box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+    -moz-box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+    box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+}
+
+.start-btn {
+    background-color: #03C463;
+    border: 1px solid #03C463;
+}
+
+.start-btn:hover {
+    background-color: #02E373;
+}
+
+.cats-btn {
+    background-color: #696969;
+    border: 1px solid  #696969;
+}
+
+.cats-btn:hover {
+    background-color: #808080;
+}
