@@ -107,6 +107,7 @@ class GetQuestionView(BarMixin, View):
         counter = user_test.counter
         test = Test.objects.get(usertestmodel=user_test)
         questions = test.testquestion_set.all().order_by('order')
+        q_quantity = len(questions)
         question = questions[counter].question
         answers = Answer.objects.filter(question=question).order_by('?')
 
@@ -120,6 +121,7 @@ class GetQuestionView(BarMixin, View):
                 'user_test': user_test,
                 'test': test,
                 'questions': questions,
+                'q_quantity': q_quantity,
                 'question': question,
                 'answers': answers,
                 'counter': counter,
@@ -172,58 +174,65 @@ class GetQuestionView(BarMixin, View):
         return redirect(url)
 
 
-def show_test_result(request):
-    user_tests = UserTestModel.objects.filter(user=request.user)
-    last_number = len(user_tests) - 1
-    user_test = user_tests[last_number]
-    user_test_questions = user_test.test.testquestion_set.order_by('order')
-    category = user_test_questions[0].question.category
+class ShowTestResultView(BarMixin, View):
+    template_name = 'quiz/test_result.html'
 
-    user_answers = UserTestAnswer.objects.get(user_test=user_test)
-    full_result = {}
+    def get(self, request, *args, **kwargs):
+        user_tests = UserTestModel.objects.filter(user=request.user)
+        last_number = len(user_tests) - 1
+        user_test = user_tests[last_number]
+        user_test_questions = user_test.test.testquestion_set.order_by('order')
+        category = user_test_questions[0].question.category
 
-    for user_test_question in user_test_questions:
-        question = user_test_question.question
-        answers = Answer.objects.filter(question=question)
+        user_answers = UserTestAnswer.objects.get(user_test=user_test)
+        full_result = {}
 
-        full_result.setdefault(question, {
-            'answers': answers,
-            'user_answers': [],
-            'correct_answers': []
+        for user_test_question in user_test_questions:
+            question = user_test_question.question
+            answers = Answer.objects.filter(question=question)
+
+            full_result.setdefault(question, {
+                'answers': answers,
+                'user_answers': [],
+                'correct_answers': []
+            })
+
+            user_answers_list = user_answers.user_answers.filter(question=question)
+            for u_answer in user_answers_list:
+                full_result[question]['user_answers'].append(u_answer)
+
+            if not full_result[question]['correct_answers']:
+                correct_answers = Answer.objects.filter(question=question, correctness=True)
+                for c_answer in correct_answers:
+                    full_result[question]['correct_answers'].append(c_answer)
+
+        quantity_questions = len(full_result)
+        success_questions = 0
+
+        for key in full_result:
+            if full_result[key]['user_answers'] == full_result[key]['correct_answers']:
+                success_questions += 1
+
+        correctness_percent = round((100 / quantity_questions * success_questions), 2)
+
+        user_test_result = UserTestResult.objects.create(
+            user_test=user_test,
+            user_test_category=category,
+            correct=success_questions,
+            incorrect=quantity_questions-success_questions
+        )
+        user_test_result.save()
+
+        user_stat, created = UserStat.objects.get_or_create(user=request.user, category=category)
+        user_stat.correct += success_questions
+        user_stat.incorrect += quantity_questions-success_questions
+        user_stat.save()
+
+        return render(request, self.template_name, context={
+            'full_result': full_result,
+            'user_test_result': user_test_result,
         })
 
-        user_answers_list = user_answers.user_answers.filter(question=question)
-        for u_answer in user_answers_list:
-            full_result[question]['user_answers'].append(u_answer)
-
-        if not full_result[question]['correct_answers']:
-            correct_answers = Answer.objects.filter(question=question, correctness=True)
-            for c_answer in correct_answers:
-                full_result[question]['correct_answers'].append(c_answer)
-
-    quantity_questions = len(full_result)
-    success_questions = 0
-
-    for key in full_result:
-        if full_result[key]['user_answers'] == full_result[key]['correct_answers']:
-            success_questions += 1
-
-    correctness_percent = round((100 / quantity_questions * success_questions), 2)
-
-    user_test_result = UserTestResult.objects.create(
-        user_test=user_test,
-        user_test_category=category,
-        correct=success_questions,
-        incorrect=quantity_questions-success_questions
-    )
-    user_test_result.save()
-
-    user_stat, created = UserStat.objects.get_or_create(user=request.user, category=category)
-    user_stat.correct += success_questions
-    user_stat.incorrect += quantity_questions-success_questions
-    user_stat.save()
-
-    return render(request, 'quiz/test_result.html', context={
-        'full_result': full_result,
-        'user_test_result': user_test_result,
-    })
+    def post(self, request):
+        url = super().post(request)
+        return redirect(url)

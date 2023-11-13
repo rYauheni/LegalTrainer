@@ -11,6 +11,6 @@ urlpatterns = [
 
     path('quiz/categories/<slug:slug_category>', views.SetTestView.as_view(), name='set_test_url'),
     path('quiz/question/<int:q_number>', views.GetQuestionView.as_view(), name='question_url'),
-    path('quiz/result/result', views.show_test_result, name='result_url')
+    path('quiz/result/result', views.ShowTestResultView.as_view(), name='result_url')
 
 ]
