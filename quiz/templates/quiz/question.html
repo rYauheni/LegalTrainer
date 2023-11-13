@@ -1,53 +1,47 @@
 {% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
 Question
 {% endblock %}
 
+{% block head %}
+    <link rel="stylesheet" href="{% static 'quiz/css/style_question.css' %}"/>
+{% endblock %}
+
 {% block content %}
-<!--<h2>{{ question.content }}</h2>-->
-<!--<ul>-->
-<!--    {% for answer in answers %}-->
-<!--    <li>-->
-<!--        {% csrf_token %}-->
-<!--        {{ form.as_p }}-->
-<!--        {{ answer }}-->
-<!--    </li>-->
-<!--    {% endfor %}-->
-<!--</ul>-->
- {{ user_test }}
-<br>
-{{ test }}
-<br>
-{{ questions }}
-<br>
-{{ counter }}
-<br>
-<hr>
-<hr>
-<h3>{{ question }}</h3>
-{% for answer in answers %}
-  <p>{{ answer }}</p>
-{% endfor %}
-<br>
-<hr>
-<hr>
-<h2> Question #{{ user_test.counter|add:"1" }}: {{ question }} </h2>
-<h3>Answers:</h3>
-<form method="post" id="test_question">
-    {% csrf_token %}
+<div class="q-block">
+    <div class="q-number">
+        <h3>Вопрос № {{ user_test.counter|add:"1" }} / {{ q_quantity }}</h3>
+    </div>
+    <div class="q-a">
+        <div class="question">
+            <h4>{{ question }}</h4>
+        </div>
+        <div class="answer">
+            <form method="post" id="test_question">
+                {% csrf_token %}
+                <div class="vars">
+                    {% for answer in form %}
+                        {{ answer }}
+                    {% endfor %}
+                </div>
 
-    {{ form.as_p }}
+                <div class="approve">
+                    {% if counter > 0 %}
+                        <button class="back-btn" type="submit" name="previous" form="test_question">Назад</button>
+                    {% endif %}
+                    {% if counter < quantity|add:"-1" %}
+                        <button class="done-btn" type="submit" name="next" form="test_question">Подтвердить</button>
+                    {% endif %}
+                    {% if counter == quantity|add:"-1" %}
+                        <button class="done-btn" type="submit" name="end" form="test_question">Завершить</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-    {% if counter > 0 %}
-        <button type="submit" name="previous" form="test_question">PREVIOUS</button>
-    {% endif %}
-    {% if counter < quantity|add:"-1" %}
-        <button type="submit" name="next" form="test_question">NEXT</button>
-    {% endif %}
-    <br>
-    {% if counter == quantity|add:"-1" %}
-        <button type="submit" name="end" form="test_question">SHOW RESULT</button>
-    {% endif %}
-</form>
+
 {% endblock %}

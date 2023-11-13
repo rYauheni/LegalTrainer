@@ -1,40 +1,76 @@
 {% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
 Test Result
 {% endblock %}
 
-{% block content %}
-<h1>Test Result:</h1>
-<hr>
-<hr>
-    <h2>Test: {{ user_test_result.user_test }}</h2>
-    <h3>category {{ user_test_result.user_test_category.title }}</h3>
-    <h3>correctness {{ user_test_result.correct }}/{{ full_result|length }} </h3>
-    <h3>q&a:</h3>
-    {% for question, content in full_result.items %}
-        <hr>
-        <p>question: {{ question }}</p>
-        <ul>
-            answers:
-            {% for answer in content.answers %}
-                <li>
-                    {{ answer }}
-                    {% if answer in content.user_answers and answer in content.correct_answers %}
-                        ==GREEN==
-                    {% elif answer not in content.user_answers and answer in content.correct_answers %}
-                        ==YELLOW==
-                    {% elif answer in content.user_answers and answer not in content.correct_answers %}
-                        ==RED==
-                    {% elif answer not in content.user_answers and answer not in content.correct_answers %}
-                        ==GREY==
-                    {% else %}
-                        ==ERRORERRORERROR==
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-        <hr>
-    {% endfor %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'quiz/css/style_test_result.css' %}"/>
+{% endblock %}
 
+{% block content %}
+<div class="result">
+    <div class="result-gen">
+        <h3>Результат теста по теме «{{ user_test_result.user_test_category.title }}»</h3>
+        <h3>Верно отвеченные вопросы {{ user_test_result.correct }} / {{ full_result|length }} </h3>
+    </div>
+
+    <div class="legend">
+        <p>Легенда:</p>
+        <ul>
+            <li>
+                <img class="correctness-img" src="{% static 'quiz/img/ans_green.png' %}">
+                - верный ответ, который был выбран (зачтено);
+            </li>
+            <li>
+                <img class="correctness-img" src="{% static 'quiz/img/ans_yellow.png' %}">
+                - верный ответ, который не был выбран (не зачтено);
+            </li>
+            <li>
+                <img class="correctness-img" src="{% static 'quiz/img/ans_red.png' %}">
+                - неверный ответ, который был выбран (не зачтено);
+            </li>
+            <li>
+                <img class="correctness-img" src="{% static 'quiz/img/ans_grey2.png' %}">
+                - неверный ответ, который не был выбран (зачтено).
+            </li>
+        </ul>
+    </div>
+
+    <div class="result-detail">
+        {% for question, content in full_result.items %}
+            <p>Вопрос № {{ forloop.counter }}. {{ question }}</p>
+            <ul>
+                {% for answer in content.answers %}
+                        {% if answer in content.user_answers and answer in content.correct_answers %}
+                            <li class="green">
+                                <img class="correctness-img" src="{% static 'quiz/img/ans_green.png' %}">
+                                {{ answer }}
+                            </li>
+                        {% elif answer not in content.user_answers and answer in content.correct_answers %}
+                            <li class="yellow">
+                                <img class="correctness-img" src="{% static 'quiz/img/ans_yellow.png' %}">
+                                {{ answer }}
+                            </li>
+                        {% elif answer in content.user_answers and answer not in content.correct_answers %}
+                            <li class="red">
+                                <img class="correctness-img" src="{% static 'quiz/img/ans_red.png' %}">
+                                {{ answer }}
+                            </li>
+                        {% elif answer not in content.user_answers and answer not in content.correct_answers %}
+                            <li class="grey">
+                                <img class="correctness-img" src="{% static 'quiz/img/ans_grey2.png' %}">
+                                {{ answer }}
+                            </li>
+                        {% endif %}
+                {% endfor %}
+            </ul>
+            {% if not forloop.last %}
+                <hr class="divider">
+            {% endif %}
+
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
