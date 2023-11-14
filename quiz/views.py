@@ -63,35 +63,35 @@ class SetTestView(BarMixin, View):
         return render(request, 'quiz/start_test.html', context={'category': category, 'qq': qq})
 
     def post(self, request, slug_category):
-        category = Category.objects.get(slug=slug_category)
-        questions = Question.objects.filter(category=category)
-        question_ids = [question.id for question in questions]
-        shuffle(question_ids)
-
-        QUESTIONS_QUANTITY = 10  # Замените на нужное количество вопросов
-
-        if len(question_ids) >= QUESTIONS_QUANTITY:
-            question_ids = question_ids[:QUESTIONS_QUANTITY]
-
-        test = Test()
-        test.save()
-
-        for order, question_id in enumerate(question_ids):
-            TestQuestion.objects.create(test=test, question_id=question_id, order=order)
-
-        user_test = UserTestModel(user=request.user, test=test, counter=0)
-        user_test.save()
-        UserTestAnswer(user_test=user_test).save()
-
-        user_test_questions = test.testquestion_set.order_by('order')
-        for order, user_test_question in enumerate(user_test_questions):
-            user_test_question.order = order
-            user_test_question.save()
-
-        url = super().post(request)
-        counter = user_test.counter
-
         if 'start' in request.POST:
+            category = Category.objects.get(slug=slug_category)
+            questions = Question.objects.filter(category=category)
+            question_ids = [question.id for question in questions]
+            shuffle(question_ids)
+
+            QUESTIONS_QUANTITY = 10  # Замените на нужное количество вопросов
+
+            if len(question_ids) >= QUESTIONS_QUANTITY:
+                question_ids = question_ids[:QUESTIONS_QUANTITY]
+
+            test = Test()
+            test.save()
+
+            for order, question_id in enumerate(question_ids):
+                TestQuestion.objects.create(test=test, question_id=question_id, order=order)
+
+            user_test = UserTestModel(user=request.user, test=test, counter=0)
+            user_test.save()
+            UserTestAnswer(user_test=user_test).save()
+
+            user_test_questions = test.testquestion_set.order_by('order')
+            for order, user_test_question in enumerate(user_test_questions):
+                user_test_question.order = order
+                user_test_question.save()
+
+            url = super().post(request)
+            counter = user_test.counter
+
             url = reverse('question_url', args=(counter,))
         elif 'cats' in request.POST:
             url = reverse('categories_list_url')
@@ -215,13 +215,14 @@ class ShowTestResultView(BarMixin, View):
 
         correctness_percent = round((100 / quantity_questions * success_questions), 2)
 
-        user_test_result = UserTestResult.objects.create(
+        user_test_result, created = UserTestResult.objects.get_or_create(
             user_test=user_test,
             user_test_category=category,
             correct=success_questions,
             incorrect=quantity_questions-success_questions
         )
-        user_test_result.save()
+        if created:
+            user_test_result.save()
 
         user_stat, created = UserStat.objects.get_or_create(user=request.user, category=category)
         user_stat.correct += success_questions
