@@ -1,43 +1,57 @@
-{% extends 'userprofile/base.html' %}
+{% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
     Profile
 {% endblock %}
 
+{% block head %}
+    <link rel="stylesheet" href="{% static 'userprofile/css/style_profile.css' %}"/>
+{% endblock %}
+
 {% block content %}
-    <h1>Profile</h1>
-    <h2>Content_temp</h2>
+    <div class="profile">
+        <div class="profile-header">
+            <h1>Профиль</h1>
+        </div>
+        <div class="profile-content">
+            <div class="profile-nav">
+                {% if user.is_authenticated %}
+                    <h3><a href="{% url 'history_url' %}">История</a></h3>
+                    <h3><a href="{% url 'stat_url' %}">Статистика</a></h3>
+                {% else %}
+                    <h3>История</h3>
+                    <h3>Статистика</h3>
+                {% endif %}
+            </div>
+            <div class="profile-data">
+                <div class="profile-info">
+                    {% if user.is_authenticated %}
+                        <h3>Вы авторизованы как {{ user.username }}</h3>
+                        <h3>Ваш адрес электронной почты {{ user.email }}</h3>
+                    {% else %}
+                        <h3>Вы не авторизованы</h3>
+                        <h3>Войдите в аккаунт или создайте новый</h3>
+                    {% endif %}
+                </div>
+                <div class="profile-acts">
+                    {% if user.is_authenticated %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="logout-btn" type="submit" name="logout">Выйти</button>
+                            <button class="act-btn" type="submit" name="change_pd">Изменить профиль</button>
+                            <button class="act-btn" type="submit" name="change_pw">Изменить пароль</button>
+                        </form>
 
-    {% if user.is_authenticated %}
-        <h3>Вы авторизованы как {{ user.username }}</h3>
-        <h3>Ваш адрес электронной почты {{ user.email }}</h3>
-    {% else %}
-        <h3>Вы не авторизованы</h3>
-    {% endif %}
-
-    <br>
-    <hr>
-    <a href="{% url 'history_url' %}">HISTORY</a>
-    <hr>
-    <a href="{% url 'stat_url' %}">STATISTIC</a>
-    <hr>
-    <br>
-
-    {% if user.is_authenticated %}
-        <p>{{ user.username }} <a href="{% url 'logout_url' %}">ВЫЙТИ</a></p>
-        <hr>
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" name="change_pd">Change pdata</button>
-        </form>
-        <hr>
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" name="change_pw">Change password</button>
-        </form>
-        <hr>
-    {% else %}
-        <p><a href="{% url 'login_url' %}">ВОЙТИ</a></p>
-        <p><a href="{% url 'register_url' %}">РЕГИСТРАЦИЯ</a></p>
-    {% endif %}
+                    {% else %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="act-btn" type="submit" name="login">Войти</button>
+                            <button class="act-btn" type="submit" name="register">Регистрация</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

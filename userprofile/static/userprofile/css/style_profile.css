@@ -1,0 +1,88 @@
+.profile {
+    display: flex;
+    flex-direction: column;
+    margin-top: 60px;
+}
+
+.profile-header h1 {
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    font-weight: bold;
+    font-size: 42px;
+    margin-top: 80px;
+    margin-bottom: 40px;
+}
+
+.profile-content {
+    display: flex;
+    flex-direction: row;
+}
+
+.profile-nav {
+    padding-right: 40px;
+}
+
+.profile-nav a {
+    font-family: 'Montserrat', sans-serif;
+    color: #FFB02E;
+    font-size: 24px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    max-width: 100%;
+}
+
+.profile-nav a:hover {
+    color: #CF8307;
+}
+
+.profile-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-data h3 {
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    font-size: 24px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    max-width: 100%;
+}
+
+button {
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+
+    border-radius: 10px;
+
+    width: 210px;
+    height: 51px;
+    color: white;
+    margin: 30px auto;
+}
+
+button:hover {
+    color: white;
+    border-radius: 20px;
+    -webkit-box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+    -moz-box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+    box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+}
+
+.act-btn {
+    background-color: #03C463;
+    border: 1px solid #03C463;
+}
+
+.act-btn:hover {
+    background-color: #02E373;
+}
+
+.logout-btn {
+    background-color: #696969;
+    border: 1px solid  #696969;
+}
+
+.logout-btn:hover {
+    background-color: #808080;
+}
