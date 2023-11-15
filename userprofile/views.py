@@ -131,7 +131,8 @@ class UserTestHistoryListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_tests = context['user_tests']
-        user_test_results = {user_test: {'is_finished': False, 'category': '', 'correct': 0, 'incorrect': 0, 'number': 0} for user_test in user_tests}
+        user_test_results = \
+            {user_test: {'is_finished': False, 'category': '', 'correct': 0, 'incorrect': 0, 'number': 0} for user_test in user_tests}
 
         page_number = self.request.GET.get('page')
         page_number = int(page_number) if page_number else 1

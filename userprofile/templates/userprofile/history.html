@@ -1,51 +1,80 @@
-{% extends 'userprofile/base.html' %}
+{% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
     History
 {% endblock %}
 
+{% block head %}
+    <link rel="stylesheet" href="{% static 'userprofile/css/style_history.css' %}"/>
+{% endblock %}
+
 {% block content %}
-    <h1>History</h1>
-    <h2>Content_temp</h2>
 
-    {% if user.is_authenticated %}
-        <h3>Вы авторизованы как {{ user.username }}</h3>
-        <h3>Ваш адрес электронной почты {{ user.email }}</h3>
-    {% else %}
-        <h3>Вы не авторизованы</h3>
-    {% endif %}
 
-    <br><br>
-<hr>
-{{ user_tests.user_test_results }}
-<hr>
+    <div class="history">
+        <div class="history-header">
+            <h1>История</h1>
+            {{ user_tests.user_test_results }}
+        </div>
+        <div class="history-content">
+            <div class="history-nav">
+                {% if user.is_authenticated %}
+                    <h3><a href="{% url 'profile_url' %}">Профиль</a></h3>
+                    <h3><a href="{% url 'stat_url' %}">Статистика</a></h3>
+                {% else %}
+                    <h3>Профиль</h3>
+                    <h3>Статистика</h3>
+                {% endif %}
+            </div>
+            <div class="history-data">
+                <div class="history-info">
+                    {% if user.is_authenticated %}
+                        {% for ut, content in user_tests.items %}
+                            {% if content.is_finished %}
+                                <p class="finished">
+                                    <a href="{% url 'history_detail_url' pk=ut.id %}">
+                                        Тест № {{ content.number }}.
+                                    </a>
+                                    «{{ content.category }}».
+                                    Результат: {{ content.correct }}/{{ content.correct|add:content.incorrect }}
+                                </p>
+                            {% else %}
+                                <p>Тест № {{ content.number }} не завершён, результат не сохранён</p>
+                            {% endif %}
+                            {% if not forloop.last %}
+                                <hr class="divider">
+                            {% endif %}
+                        {% empty %}
+                            <p>Вы не прошли ещё ни одного теста</p>
+                        {% endfor %}
+                    {% else %}
+                        <h3>Вы не авторизованы</h3>
+                        <h3>Войдите в аккаунт или создайте новый</h3>
+                    {% endif %}
+                </div>
 
-    {% if user.is_authenticated %}
-        {% for ut, content in user_tests.items %}
-            {% if content.is_finished %}
-                <a href="{% url 'history_detail_url' pk=ut.id %}">
-                    Test # {{ content.number }}.
-                </a>
-                {{ content.category  }} result: {{ content.correct }}/10
-            {% else %}
-                Test # {{ content.number }}. HAS NOT FINISHED
-            {% endif %}
-            <hr>
-        {% empty %}
-            <p>Вы не прошли ещё ни одного теста</p>
-        {% endfor %}
-    {% else %}
-        <p><a href="{% url 'login_url' %}">ВОЙТИ</a></p>
-        <p><a href="{% url 'register_url' %}">РЕГИСТРАЦИЯ</a></p>
-    {% endif %}
+                <div class="history-pagination">
+                    {% if page_obj.has_other_pages %}
+                        {% if page_obj.number > 3 %}
+                            <a href="?page=1" class="extrem">&laquo; 1</a>
+                        {% endif %}
 
-    <nav>
-        <ul>
-            {% for p in paginator.page_range %}
-                <li>
-                    <a href="?page={{ p }}">{{ p }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </nav>
+                        {% for p in paginator.page_range %}
+                            {% if page_obj.number == p %}
+                            <a href="?page={{ p }}" class="active">{{ p }}</a>
+                            {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+                            <a href="?page={{ p }}">{{ p }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.number < paginator.num_pages|add:-3 %}
+                            <a href="?page={{ paginator.num_pages }}" class="extrem">{{ paginator.num_pages }} &raquo;</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
