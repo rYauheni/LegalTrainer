@@ -13,6 +13,8 @@ from .forms import RegisterUserForm, LoginUserForm, UserProfileForm, UserPasswor
 from .utils import show_pie_histogram, show_bar_histogram
 from .tasks import cleanup_old_images
 
+from quiz.utils import BarMixin
+
 from quiz.models import Category, Answer, Test, UserTestModel, UserTestAnswer, UserTestResult
 
 
@@ -49,14 +51,14 @@ def logout_user(request):
     return redirect('login_url')
 
 
-class ShowProfileView(View):
+class ShowProfileView(BarMixin, View):
     template_name = 'userprofile/profile.html'
 
     def get(self, request):
         return render(request, self.template_name)
 
     def post(self, request):
-        url = reverse('profile_url')
+        url = super().post(request)
         if 'change_pd' in request.POST:
             url = reverse('change_pd_url')
         elif 'change_pw' in request.POST:
