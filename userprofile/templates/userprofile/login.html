@@ -1,17 +1,48 @@
-{% extends 'userprofile/base.html' %}
+{% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
-    Авторизация
+    LogIn
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'userprofile/css/style_login.css' %}"/>
 {% endblock %}
 
 {% block content %}
-    <form method="post">
-        {% csrf_token %}
-<!--        {% for field in form %}-->
-<!--            <p><label class="form_label" for="{{ field.id_for_label }}">{{ field.label }}: </label></p>-->
-<!--            <div class="form-error">{{ field.errors }}</div>-->
-<!--        {% endfor %}-->
-        {{ form.as_p }}
-        <button type="submit">Войти</button>
-    </form>
+<div class="login">
+    <div class="login-header">
+        <h1>Авторизация</h1>
+    </div>
+    <div class="login-form">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-content">
+                {% for field in form %}
+                    <div class="form-data">
+                        <div class="form-label">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                        </div>
+                        <div class="form-field">
+                            {{ field }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="form-errors">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+            <div class="form-acts">
+                <div class="act-reg">
+                    <a href="{% url 'register_url' %}">Создать аккаунт</a>
+                </div>
+                <div class="act-submit">
+                    <button type="submit" name="login">Войти</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
