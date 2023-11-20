@@ -38,12 +38,21 @@ def get_register_success(request):
     return render(request, 'userprofile/reg_success.html')
 
 
-class LoginUser(LoginView):
+class LoginUser(LoginView, BarMixin):
     form_class = LoginUserForm
     template_name = 'userprofile/login.html'
 
     def get_success_url(self):
-        return reverse_lazy('index_url')
+        return reverse('index_url')
+
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        messages.error(self.request, 'Логин или пароль введены неверно.')
+        return response
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        return response
 
 
 def logout_user(request):
