@@ -23,7 +23,7 @@ import time
 # Create your views here.
 
 
-class RegisterUser(CreateView):
+class RegisterUser(CreateView, BarMixin):
     form_class = RegisterUserForm
     template_name = 'userprofile/register.html'
     success_url = reverse_lazy('reg_success_url')
@@ -66,7 +66,7 @@ class ShowProfileView(BarMixin, View):
     def get(self, request):
         return render(request, self.template_name)
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         url = super().post(request)
         if 'change_pd' in request.POST:
             url = reverse('change_pd_url')
@@ -128,7 +128,7 @@ def get_change_pw_success(request):
     return render(request, 'userprofile/change_pw_success.html')
 
 
-class UserTestHistoryListView(ListView):
+class UserTestHistoryListView(ListView, BarMixin):
     template_name = 'userprofile/history.html'
     model = UserTestModel
     context_object_name = 'user_tests'
@@ -167,8 +167,12 @@ class UserTestHistoryListView(ListView):
 
         return context
 
+    def post(self, request, *args, **kwargs):
+        url = super().post(request)
+        return redirect(url)
 
-class UserTestDetailView(DetailView):
+
+class UserTestDetailView(DetailView, BarMixin):
     template_name = 'userprofile/history_detail.html'
     model = UserTestModel
     context_object_name = 'user_test'
@@ -205,6 +209,10 @@ class UserTestDetailView(DetailView):
         context['user_test_result'] = user_test_result
         context['full_user_test_result'] = full_user_test_result
         return context
+
+    def post(self, request, *args, **kwargs):
+        url = super().post(request)
+        return redirect(url)
 
 
 def show_stat(request):
