@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+{% if not user.is_authenticated %}
 <div class="login">
     <div class="login-header">
         <h1>Авторизация</h1>
@@ -21,7 +22,7 @@
                 {% for field in form %}
                     <div class="form-data">
                         <div class="form-label">
-                            <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                            <label>{{ field.label }}:</label>
                         </div>
                         <div class="form-field">
                             {{ field }}
@@ -45,4 +46,11 @@
         </form>
     </div>
 </div>
+{% else %}
+<div class="login">
+    <div class="login-header">
+        <h1>Вы уже авторизованы как {{ user.username }}</h1>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

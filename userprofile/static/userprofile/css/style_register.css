@@ -1,0 +1,148 @@
+.register {
+    display: flex;
+    flex-direction: column;
+}
+
+.register-header h1 {
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    font-weight: bold;
+    font-size: 42px;
+    margin-top: 60px;
+    margin-bottom: 40px;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+}
+
+.form-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-data {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 10px;
+}
+
+.form-label {
+    width: 50%;
+    text-align: right;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.form-label label {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    font-size: 18px;
+}
+
+form-field {
+display: flex;
+flex-direction: column;
+    width: 50%;
+    margin-left: 10px;
+}
+
+.form-field input {
+    background-color: #fff;
+    border: 2px solid #FFB02E;
+    border-radius: 10px;
+    width: 200px;
+
+    font-family: 'Montserrat', sans-serif;
+    color: #333333;
+    font-size: 18px;
+
+    padding-left: 5px;
+}
+
+.form-field input:hover {
+    border: 2px solid #CF8307;
+}
+
+.form-field img {
+    margin-bottom: 10px;
+    border: 2px solid #FFB02E;
+    border-radius: 10px;
+}
+
+.form-field a {
+    margin-left: 5px;
+    font-size: 32px;
+    color: #FFB02E;
+}
+
+.form-field a:hover {
+    color: #CF8307;
+}
+
+.errors {
+    list-style-type: none;
+}
+
+.errors p {
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    font-size: 14px;
+}
+
+
+.form-acts {
+    display: flex;
+    flex-direction: row;
+    margin-top: 30px;
+}
+
+.act-log {
+    display: flex;
+    align-items: center;
+    width: 50%;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.act-log a {
+    font-family: 'Montserrat', sans-serif;
+    color: #FFB02E;
+    font-size: 18px;
+}
+
+.act-log a:hover {
+    color: #CF8307;
+}
+
+.act-submit {
+    margin-right: 10px;
+}
+
+button {
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+
+    background-color: #03C463;
+    border: 1px solid #03C463;
+    border-radius: 10px;
+
+    width: 210px;
+    height: 51px;
+    color: white;
+}
+
+button:hover {
+    color: white;
+    background-color: #02E373;
+    border-radius: 20px;
+    -webkit-box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+    -moz-box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+    box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
+}

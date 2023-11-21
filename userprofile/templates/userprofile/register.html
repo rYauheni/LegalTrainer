@@ -1,23 +1,63 @@
-{% extends 'userprofile/base.html' %}
+{% extends 'quiz/base.html' %}
 {% load static %}
 
 {% block title %}
-Регистрация
+    SignUp
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'userprofile/css/style_register.css' %}"/>
 {% endblock %}
 
 {% block content %}
-<form method="post">
-    {% csrf_token %}
+{% if not user.is_authenticated %}
+<div class="register">
+    <div class="register-header">
+        <h1>Регистрация</h1>
+    </div>
+    <div class="register-form">
+        <form method="post" name="register_form">
+            {% csrf_token %}
+            <div class="form-content">
+                {% for field in form %}
+                    <div class="form-data">
+                        <div class="form-label">
+                            <label>{{ field.label }}:</label>
+                        </div>
+                        <div class="form-field">
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="errors">
+                                    {% for error in field.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
 
-    {{ form.as_p }}
 
-    <!--    CAPTCHA RELOAD BUTTON-->
-    <script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
-    <script type="text/javascript" src="{% static 'userprofile/js/captcha.js' %}"></script>
-    <button class='captcha-refresh'>
-        <img src="{% static 'userprofile/img/reload.png' %}">
-    </button>
-
-    <button type="submit">Зарегистрировать</button>
-</form>
+                <!--    CAPTCHA RELOAD BUTTON-->
+                <script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+                <script type="text/javascript" src="{% static 'userprofile/js/captcha.js' %}"></script>
+            </div>
+            <div class="form-acts">
+                <div class="act-log">
+                    <a href="{% url 'login_url' %}">Уже есть аккаунт</a>
+                </div>
+                <div class="act-submit">
+                    <button type="submit">Создать</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% else %}
+<div class="register">
+    <div class="register-header">
+        <h1>Вы уже авторизованы как {{ user.username }}</h1>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
