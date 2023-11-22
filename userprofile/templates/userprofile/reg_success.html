@@ -1,9 +1,22 @@
-{% extends 'userprofile/base.html' %}
+{% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
     Success
 {% endblock %}
 
+{% block head %}
+    <link rel="stylesheet" href="{% static 'userprofile/css/style_success.css' %}"/>
+{% endblock %}
+
 {% block content %}
-    <h1>REGISTER SUCCESS</h1>
+    <div class="success">
+        <div class="success-header">
+            <h1>Регистрация прошла успешно</h1>
+        </div>
+        <div class="success-links">
+            <a href="{% url 'index_url' %}">Главная</a>
+            <a href="{% url 'profile_url' %}">Профиль</a>
+        </div>
+    </div>
 {% endblock %}

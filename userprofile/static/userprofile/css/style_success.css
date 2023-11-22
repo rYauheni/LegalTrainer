@@ -1,0 +1,29 @@
+.success {
+    display: flex;
+    flex-direction: column;
+}
+
+.success-header h1 {
+    font-family: 'Montserrat', sans-serif;
+    color: #fff;
+    font-weight: bold;
+    font-size: 42px;
+    margin-top: 60px;
+    margin-bottom: 40px;
+}
+
+.success-links {
+    display: flex;
+    flex-direction: row;
+}
+
+.success-links a {
+    font-family: 'Montserrat', sans-serif;
+    color: #FFB02E;
+    font-size: 18px;
+    margin-right: 20px;
+}
+
+.success-links a:hover {
+    color: #CF8307;
+}
