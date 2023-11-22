@@ -7,6 +7,19 @@ from django.templatetags.static import static
 
 matplotlib.use('agg')
 
+USERNAME_VALIDATION = {
+    'min_length': 4,
+    'max_length': 20,
+    'content': r'^[a-zA-Z0-9]+$'  # only Latin letters and digits
+}
+
+PASSWORD_VALIDATION = {
+    'min_length': 4,
+    'max_length': 20,
+    'content': r'^[a-zA-Z0-9]+$',  # only Latin letters and digits
+    'requirements': r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$'  # at least one uppercase, one lowercase letter and one digit
+}
+
 
 def show_pie_histogram(correct: int, incorrect: int) -> str:
     if correct == 0 and incorrect == 0:
