@@ -9,7 +9,7 @@ from django.views import View
 from django.views.generic import CreateView, ListView, DetailView
 
 from .models import UserStat
-from .forms import RegisterUserForm, LoginUserForm, UserProfileForm, UserPasswordChangeForm
+from .forms import RegisterUserForm, LoginUserForm, UserProfileChangeForm, UserPasswordChangeForm
 from .utils import show_pie_histogram, show_bar_histogram
 from .tasks import cleanup_old_images
 
@@ -81,13 +81,13 @@ class ChangeProfileDataView(View):
     def get(self, request):
         user = request.user
         user_data = {'username': user.username, 'email': user.email}
-        form = UserProfileForm(instance=user)
+        form = UserProfileChangeForm(instance=user)
         return render(request, self.template_name, context={'form': form, 'user_data': user_data})
 
     def post(self, request):
         user = request.user
         user_data = {'username': user.username, 'email': user.email}
-        form = UserProfileForm(request.POST, instance=user)
+        form = UserProfileChangeForm(request.POST, instance=user)
         if form.is_valid():
             if form.cleaned_data['password']:
                 if not user.check_password(form.cleaned_data['password']):
