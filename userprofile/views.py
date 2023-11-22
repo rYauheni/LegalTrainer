@@ -18,11 +18,6 @@ from quiz.utils import BarMixin
 from quiz.models import Category, Answer, Test, UserTestModel, UserTestAnswer, UserTestResult
 
 
-import time
-
-# Create your views here.
-
-
 class RegisterUser(CreateView, BarMixin):
     form_class = RegisterUserForm
     template_name = 'userprofile/register.html'
@@ -34,8 +29,15 @@ class RegisterUser(CreateView, BarMixin):
         return redirect('reg_success_url')
 
 
-def get_register_success(request):
-    return render(request, 'userprofile/reg_success.html')
+class RegisterSuccessView(BarMixin, View):
+    template_name = 'userprofile/reg_success.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request, *args, **kwargs):
+        url = super().post(request)
+        return redirect(url)
 
 
 class LoginUser(LoginView, BarMixin):
@@ -102,8 +104,15 @@ class ChangeProfileDataView(View):
             return render(request, self.template_name, context={'form': form, 'user_data': user_data})
 
 
-def get_change_pd_success(request):
-    return render(request, 'userprofile/change_pd_success.html')
+class ChangeProfileDataSuccessView(BarMixin, View):
+    template_name = 'userprofile/change_pd_success.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request, *args, **kwargs):
+        url = super().post(request)
+        return redirect(url)
 
 
 class ChangePasswordView(View):
@@ -124,8 +133,15 @@ class ChangePasswordView(View):
             return render(request, self.template_name, context={'form': form})
 
 
-def get_change_pw_success(request):
-    return render(request, 'userprofile/change_pw_success.html')
+class ChangePasswordSuccessView(BarMixin, View):
+    template_name = 'userprofile/change_pw_success.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request, *args, **kwargs):
+        url = super().post(request)
+        return redirect(url)
 
 
 class UserTestHistoryListView(ListView, BarMixin):
