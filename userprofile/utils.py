@@ -14,7 +14,7 @@ USERNAME_VALIDATION = {
 }
 
 PASSWORD_VALIDATION = {
-    'min_length': 4,
+    'min_length': 8,
     'max_length': 20,
     'content': r'^[a-zA-Z0-9]+$',  # only Latin letters and digits
     'requirements': r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$'  # at least one uppercase, one lowercase letter and one digit
