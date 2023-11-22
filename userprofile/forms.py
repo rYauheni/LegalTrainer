@@ -148,3 +148,40 @@ class UserPasswordChangeForm(PasswordChangeForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         help_text="Повторно введите новый пароль для подтверждения."
     )
+
+    def clean_old_password(self):
+        old_password = self.cleaned_data.get('old_password')
+        user = self.user
+
+        if not user.check_password(old_password):
+            raise forms.ValidationError('Старый пароль введён неверно')
+
+    def clean_new_password1(self):
+        new_password1 = self.cleaned_data.get('new_password1')
+
+        if len(new_password1) < PASSWORD_VALIDATION['min_length'] or len(new_password1) > PASSWORD_VALIDATION['max_length']:
+            raise forms.ValidationError(
+                f"Длина пароля должна быть не менее {PASSWORD_VALIDATION['min_length']} "
+                f"и не более {PASSWORD_VALIDATION['max_length']} символов."
+            )
+
+        if not re.match(PASSWORD_VALIDATION['requirements'], new_password1):
+            raise forms.ValidationError(
+                'Пароль должен содержать как минимум 1 заглавную, 1 строчную букву и 1 цифру'
+            )
+
+        if not re.match(PASSWORD_VALIDATION['content'], new_password1):
+            raise forms.ValidationError(
+                'Пароль должен содержать только латинские буквы и цифры.'
+            )
+
+        return new_password1
+
+    def clean_new_password2(self):
+        new_password1 = self.cleaned_data.get('new_password1')
+        new_password2 = self.cleaned_data.get('new_password2')
+
+        if new_password1 != new_password2:
+            raise forms.ValidationError('Пароли не совпадают.')
+
+        return new_password2
