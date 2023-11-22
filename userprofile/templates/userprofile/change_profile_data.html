@@ -6,16 +6,16 @@
 {% endblock %}
 
 {% block head %}
-    <link rel="stylesheet" href="{% static 'userprofile/css/style_change_pd.css' %}"/>
+    <link rel="stylesheet" href="{% static 'userprofile/css/style_change_data.css' %}"/>
 {% endblock %}
 
 {% block content %}
 {% if user.is_authenticated %}
-<div class="change-pd">
+<div class="change-data">
     <div class="change-pd-header">
         <h1>Изменение данных профиля</h1>
     </div>
-    <div class="change-pd-form">
+    <div class="change-data-form">
         <form method="post">
             {% csrf_token %}
             <div class="form-content">
@@ -49,8 +49,8 @@
     </div>
 </div>
 {% else %}
-<div class="change-pd">
-    <div class="change-pd-header">
+<div class="change-data">
+    <div class="change-data-header">
         <h1>Вы не авторизованы</h1>
     </div>
 </div>
