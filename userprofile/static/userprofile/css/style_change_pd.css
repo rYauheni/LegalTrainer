@@ -1,9 +1,9 @@
-.register {
+.change-pd {
     display: flex;
     flex-direction: column;
 }
 
-.register-header h1 {
+.change-pd-header h1 {
     font-family: 'Montserrat', sans-serif;
     color: #fff;
     font-weight: bold;
@@ -12,7 +12,7 @@
     margin-bottom: 40px;
 }
 
-.register-form {
+.change-pd-form {
     display: flex;
     flex-direction: column;
     margin-top: 30px;
