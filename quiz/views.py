@@ -69,7 +69,7 @@ class SetTestView(BarMixin, View):
             question_ids = [question.id for question in questions]
             shuffle(question_ids)
 
-            QUESTIONS_QUANTITY = 10  # Замените на нужное количество вопросов
+            QUESTIONS_QUANTITY = 10
 
             if len(question_ids) >= QUESTIONS_QUANTITY:
                 question_ids = question_ids[:QUESTIONS_QUANTITY]
@@ -224,10 +224,10 @@ class ShowTestResultView(BarMixin, View):
         if created:
             user_test_result.save()
 
-        user_stat, created = UserStat.objects.get_or_create(user=request.user, category=category)
-        user_stat.correct += success_questions
-        user_stat.incorrect += quantity_questions-success_questions
-        user_stat.save()
+            user_stat, created = UserStat.objects.get_or_create(user=request.user, category=category)
+            user_stat.correct += success_questions
+            user_stat.incorrect += quantity_questions-success_questions
+            user_stat.save()
 
         return render(request, self.template_name, context={
             'full_result': full_result,
