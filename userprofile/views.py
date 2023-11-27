@@ -231,46 +231,60 @@ class UserTestDetailView(DetailView, BarMixin):
         return redirect(url)
 
 
-def show_stat(request):
-    cleanup_old_images()
-    user_tests = UserTestModel.objects.filter(user=request.user)
-    total_tests = user_tests.count()
-    total_questions = 0
-    correct_questions = 0
-    incorrect_questions = 0
-    categories = Category.objects.all()
-    categories_stat = {category.title: {'questions': 0, 'correct': 0, 'incorrect': 0, 'his_pie': ''} for category in
-                       categories}
+class ShowStatView(BarMixin, View):
+    template_name = 'userprofile/stat.html'
 
-    #####  NEW
+    def get(self, request, *args, **kwargs):
+        cleanup_old_images()
+        user_tests = UserTestModel.objects.filter(user=request.user)
+        total_tests = user_tests.count()
+        total_questions = 0
+        correct_questions = 0
+        incorrect_questions = 0
+        categories = Category.objects.all()
+        categories_stat = {category.title: {'questions': 0, 'correct': 0, 'incorrect': 0, 'his_pie': ''} for category in categories}
 
-    user_stats = UserStat.objects.filter(user=request.user)
-    for stat in user_stats:
-        category = stat.category.title
-        correct = stat.correct
-        incorrect = stat.incorrect
-        questions = correct + incorrect
-        total_questions += questions
-        correct_questions += correct
-        incorrect_questions += incorrect
-        categories_stat[category]['questions'] += questions
-        categories_stat[category]['correct'] += correct
-        categories_stat[category]['incorrect'] += incorrect
-        categories_stat[category]['his_pie'] += show_pie_histogram(categories_stat[category]['correct'],
-                                                                   categories_stat[category]['incorrect'])
+        finished_tests = 0
+        for user_test in user_tests:
+            try:
+                user_test_result = UserTestResult.objects.get(user_test=user_test)
+            except UserTestResult.DoesNotExist:
+                user_test_result = 0
+            if user_test_result:
+                finished_tests += 1
+        unfinished_tests = total_tests - finished_tests
 
-    ####
+        user_stats = UserStat.objects.filter(user=request.user)
+        for stat in user_stats:
+            category = stat.category.title
+            correct = stat.correct
+            incorrect = stat.incorrect
+            questions = correct + incorrect
+            total_questions += questions
+            correct_questions += correct
+            incorrect_questions += incorrect
+            categories_stat[category]['questions'] += questions
+            categories_stat[category]['correct'] += correct
+            categories_stat[category]['incorrect'] += incorrect
+            categories_stat[category]['his_pie'] += show_pie_histogram(correct=categories_stat[category]['correct'],
+                                                                    incorrect=categories_stat[category]['incorrect'],
+                                                                    is_label=False)
 
-    total_his_pie = show_pie_histogram(correct_questions, incorrect_questions)
-    total_his_bar = show_bar_histogram(labels=tuple(cat for cat in categories_stat),
-                                       vals=tuple(v['questions'] for v in categories_stat.values()))
-    return render(request, 'userprofile/stat.html', context={
+        total_his_pie = show_pie_histogram(correct_questions, incorrect_questions, is_label=True)
+        total_his_bar = show_bar_histogram(labels=tuple(cat for cat in categories_stat),
+                                           vals=tuple(v['questions'] for v in categories_stat.values()))
+        return render(request, self.template_name, context={
             'total_tests': total_tests,
+            'finished_tests': finished_tests,
+            'unfinished_tests': unfinished_tests,
             'total_questions': total_questions,
             'correct_questions': correct_questions,
             'incorrect_questions': incorrect_questions,
             'total_his_pie': total_his_pie,
             'total_his_bar': total_his_bar,
             'categories_stat': categories_stat,
+        })
 
-    })
+    def post(self, request, *args, **kwargs):
+        url = super().post(request)
+        return redirect(url)
