@@ -18,6 +18,6 @@ urlpatterns = [
     path('profile/history', views.UserTestHistoryListView.as_view(), name='history_url'),
     path('profile/history/<int:pk>', views.UserTestDetailView.as_view(), name='history_detail_url'),
 
-    path('profile/stat', views.show_stat, name='stat_url'),
+    path('profile/stat', views.ShowStatView.as_view(), name='stat_url'),
 
 ]
