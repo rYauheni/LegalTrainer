@@ -1,60 +1,97 @@
-{% extends 'userprofile/base.html' %}
-<!--{% load static %}-->
+{% extends 'quiz/base.html' %}
+{% load static %}
 
 {% block title %}
     Statistic
 {% endblock %}
 
+{% block head %}
+    <link rel="stylesheet" href="{% static 'userprofile/css/style_stat.css' %}"/>
+{% endblock %}
+
 {% block content %}
-    <h1>Statistic</h1>
-    <h2>Content_temp</h2>
+{% if user.is_authenticated %}
+    <div class="stat">
+        <div class="stat-header">
+            <h1>Статистика</h1>
+        </div>
+        <div class="stat-content">
+            <div class="stat-nav">
+                <h3><a href="{% url 'profile_url' %}">Профиль</a></h3>
+                <h3><a href="{% url 'history_url' %}">История</a></h3>
+            </div>
+            <div class="stat-data">
+                <div class="data-general">
+                    <div class="data-general-text">
+                        <h3>Всего пройдено тестов: {{ finished_tests }}</h3>
+                        <h3>Количество незавершённых тестов: {{ unfinished_tests }}</h3>
+                        <h3>Подробнее о результатах тестов можно узнать в блоке
+                            <a href="{% url 'history_url' %}">История</a>
+                        </h3>
+                        <hr>
+                        <h3>Количество вопросов, на которые получен ответ: {{ total_questions }}*, из которых:</h3>
+                        <ul>
+                            <li><h3>вопросы, на которые получен верный ответ: {{ correct_questions }}</h3></li>
+                            <li><h3>вопросы, на которые получен неверный ответ: {{ incorrect_questions }}</h3></li>
+                        </ul>
+                        <h6>*учитываются вопросы только из полностью пройденных тестов</h6>
+                        <hr>
+                        <h3 class="title">Распределение отвеченных вопросов по категориям:</h3>
+                        {% if total_his_bar|slice:":7" == '/media/' %}
+                            <img class="his-bar" src="{{ total_his_bar }}" alt="Pie Histogram">
+                        {% else %}
+                            <img class=his-bar-blank" src="{% static 'userprofile/img/his_placeholder.png' %}">
+                        {% endif %}
+                        <hr>
+                        <h3 class="title">Общая корректность полученных ответов:</h3>
+                        {% if total_his_pie|slice:":7" == '/media/' %}
+                            <img class="pie-bar" src="{{ total_his_pie }}" alt="Pie Histogram">
+                        {% else %}
+                            <img class="pie-bar-blank" src="{% static 'userprofile/img/his_placeholder.png' %}">
+                        {% endif %}
+                        <hr>
+                    </div>
+                </div>
+                <div class="data-detail">
+                    <h3>Корректность полученных ответов по категориям</h3>
+                    <div class="data-detail-content">
+                        {% for category, stats in categories_stat.items %}
+                        <div class="data-detail-instance">
+                            <h4>{{ category }}</h4>
+                            <h5>Всего: {{ stats.questions }}</h5>
+                            <h5>Верно: {{ stats.correct }}</h5>
+                            <h5>Неверно: {{ stats.incorrect }}</h5>
+                            {% if stats.his_pie|slice:":7" == '/media/' %}
+                            <img class="pie-bar-detail" src="{{ stats.his_pie }}" alt="Pie Histogram">
+                            {% else %}
+                            <img class="pie-bar-detail-blank" src="{% static 'userprofile/img/his_placeholder.png' %}">
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
 
-    {% if user.is_authenticated %}
-        <h3>Вы авторизованы как {{ user.username }}</h3>
-        <h3>Ваш адрес электронной почты {{ user.email }}</h3>
-    {% else %}
-        <h3>Вы не авторизованы</h3>
-    {% endif %}
+        </div>
 
-    <br><br>
+    </div>
 
-    {% if user.is_authenticated %}
-        <hr>
-        total_tests: {{ total_tests }}
-        <hr>
-        'total_questions': {{ total_questions }}
-        <hr>
-        'correct_questions': {{ correct_questions }}
-        <hr>
-        'incorrect_questions': {{ incorrect_questions }}
-        <hr>
-        <h3>PIE_H</h3>
-            {% if total_his_pie|slice:":7" == '/media/' %}
-                <img src="{{ total_his_pie }}" alt="Pie Histogram">
-            {% else %}
-                <img src="{% static 'userprofile/img/his_placeholder.png' %}">
-            {% endif %}
-        <hr>
-        <h3>BAR_H</h3>
-            {% if total_his_bar|slice:":7" == '/media/' %}
-                <img src="{{ total_his_bar }}" alt="Pie Histogram">
-            {% else %}
-                <img src="{% static 'userprofile/img/his_placeholder.png' %}">
-            {% endif %}
-        {% for category, stats in categories_stat.items %}
-            <h3>Category: {{ category }}</h3>
-            <p>Total: {{ stats.questions }}</p>
-            <p>Correct: {{ stats.correct }}</p>
-            <p>Incorrect: {{ stats.incorrect }}</p>
-            {% if stats.his_pie|slice:":7" == '/media/' %}
-                <img src="{{ stats.his_pie }}" alt="Pie Histogram">
-            {% else %}
-                <img src="{% static 'userprofile/img/his_placeholder.png' %}">
-            {% endif %}
-        {% endfor %}
-        <hr>
-    {% else %}
-        <p><a href="{% url 'login_url' %}">ВОЙТИ</a></p>
-        <p><a href="{% url 'register_url' %}">РЕГИСТРАЦИЯ</a></p>
-    {% endif %}
+{% else %}
+    <div class="stat">
+        <div class="stat-header">
+            <h1>Статистика</h1>
+        </div>
+        <div class="stat-content">
+            <div class="stat-nav">
+                <h3>Профиль</h3>
+                <h3>Статистика</h3>
+            </div>
+            <div class="stat-data">
+                <h3>Вы не авторизованы</h3>
+                <h3>Войдите в аккаунт или создайте новый</h3>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 {% endblock %}
