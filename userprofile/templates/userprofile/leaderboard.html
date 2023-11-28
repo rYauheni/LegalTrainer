@@ -1,0 +1,89 @@
+{% extends 'quiz/base.html' %}
+{% load static %}
+
+{% block title %}
+    LeaderBoard
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'userprofile/css/style_leaderboard.css' %}"/>
+{% endblock %}
+
+
+{% block content %}
+<div class="leaderboard">
+    <div class="leaderboard-header">
+        <h1>Топ-10</h1>
+    </div>
+    <div class="leaderboard-content">
+        <table id="mytable">
+            <thead>
+            <tr>
+                <th class="sortable" data-column="place">Место</th>
+                <th class="sortable" data-column="user">Пользователь</th>
+                <th class="sortable" data-column="quantity">Всего вопросов</th>
+                <th class="sortable" data-column="correctness">Правильность %</th>
+                <th class="sortable" data-column="points">Очки</th>
+            </tr>
+            </thead>
+
+            <tbody id="table1">
+            {% for leader, record in top_10.items %}
+                {% if leader == user.username %}
+                    <tr class="user-record">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ leader }} (Вы)</td>
+                        <td>{{ record.quantity }}</td>
+                        <td>{{ record.correctness }}</td>
+                        <td>{{ record.points }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ leader }}</td>
+                        <td>{{ record.quantity }}</td>
+                        <td>{{ record.correctness }}</td>
+                        <td>{{ record.points }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+
+            {% if user_result and not user_in_top %}
+                <tr>
+                    <td>...</td>
+                    <td>...</td>
+                    <td>...</td>
+                    <td>...</td>
+                    <td>...</td>
+                </tr>
+                <tr class="user-record">
+                    <td>-</td>
+                    <td>{{ user.username }} (Вы)</td>
+                    <td>{{ user_result.quantity }}</td>
+                    <td>{{ user_result.correctness }}</td>
+                    <td>{{ user_result.points }}</td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="leaderboard-user">
+    {% if user.is_authenticated %}
+        {% if user_result %}
+            {% if not user_in_top %}
+                <h4>Вы пока не попали в Топ-10.</h4>
+                <h4>Есть к чему стремиться ;)</h4>
+            {% endif %}
+        {% else %}
+            <h4>Вы пока не прошли ни одного теста</h4>
+        {% endif %}
+    {% else %}
+        <h4>Вы не авторизованы.</h4>
+        <h4>Войдите в аккаунт или создайте новый.</h4>
+    {% endif %}
+    </div>
+
+</div>
+
+
+{% endblock %}

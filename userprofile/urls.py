@@ -20,4 +20,6 @@ urlpatterns = [
 
     path('profile/stat', views.ShowStatView.as_view(), name='stat_url'),
 
+    path('leaderboard', views.LeaderBoardView.as_view(), name='leaderboard_url')
+
 ]

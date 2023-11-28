@@ -157,7 +157,8 @@ class UserTestHistoryListView(ListView, BarMixin):
         context = super().get_context_data(**kwargs)
         user_tests = context['user_tests']
         user_test_results = \
-            {user_test: {'is_finished': False, 'category': '', 'correct': 0, 'incorrect': 0, 'number': 0} for user_test in user_tests}
+            {user_test: {'is_finished': False, 'category': '', 'correct': 0, 'incorrect': 0, 'number': 0} for user_test
+             in user_tests}
 
         page_number = self.request.GET.get('page')
         page_number = int(page_number) if page_number else 1
@@ -242,7 +243,8 @@ class ShowStatView(BarMixin, View):
         correct_questions = 0
         incorrect_questions = 0
         categories = Category.objects.all()
-        categories_stat = {category.title: {'questions': 0, 'correct': 0, 'incorrect': 0, 'his_pie': ''} for category in categories}
+        categories_stat = {category.title: {'questions': 0, 'correct': 0, 'incorrect': 0, 'his_pie': ''} for category in
+                           categories}
 
         finished_tests = 0
         for user_test in user_tests:
@@ -267,8 +269,8 @@ class ShowStatView(BarMixin, View):
             categories_stat[category]['correct'] += correct
             categories_stat[category]['incorrect'] += incorrect
             categories_stat[category]['his_pie'] += show_pie_histogram(correct=categories_stat[category]['correct'],
-                                                                    incorrect=categories_stat[category]['incorrect'],
-                                                                    is_label=False)
+                                                                       incorrect=categories_stat[category]['incorrect'],
+                                                                       is_label=False)
 
         total_his_pie = show_pie_histogram(correct_questions, incorrect_questions, is_label=True)
         total_his_bar = show_bar_histogram(labels=tuple(cat for cat in categories_stat),
@@ -287,4 +289,55 @@ class ShowStatView(BarMixin, View):
 
     def post(self, request, *args, **kwargs):
         url = super().post(request)
+        return redirect(url)
+
+
+class LeaderBoardView(BarMixin, View):
+    template_name = 'userprofile/leaderboard.html'
+
+    def get(self, request):
+        users_stats = UserStat.objects.all()
+        all_results = {}
+        leaderboard = {}
+
+        for user_stat in users_stats:
+            user = str(user_stat.user)
+            quantity = user_stat.correct + user_stat.incorrect
+            correct = user_stat.correct
+
+            if user not in all_results:
+                all_results[f'{user}'] = {
+                    'quantity': quantity,
+                    'correct': correct,
+                }
+            else:
+                all_results[f'{user}']['quantity'] += quantity
+                all_results[f'{user}']['correct'] += correct
+
+        for leader, record in all_results.items():
+            correctness = round(100 / record['quantity'] * record['correct'], 2)
+            points = round(record['correct'] * correctness)
+
+            leaderboard[f'{leader}'] = {
+                'quantity': record['quantity'],
+                'correctness': correctness,
+                'points': points
+            }
+
+        sorted_leaderboard = sorted(leaderboard.items(), key=lambda item: item[1]['points'], reverse=True)
+        top_10 = dict(sorted_leaderboard[:10])
+
+        user = str(request.user)
+        user_in_top = True if user in top_10 else False
+        user_result = leaderboard.get(user)
+
+        return render(request, self.template_name, context={
+            'top_10': top_10,
+            'user_in_top': user_in_top,
+            'user_result': user_result
+        })
+
+    def post(self, request, *args, **kwargs):
+        url = super().post(request)
+
         return redirect(url)
