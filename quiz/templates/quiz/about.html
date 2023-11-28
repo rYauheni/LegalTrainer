@@ -1,0 +1,26 @@
+{% extends 'quiz/base.html' %}
+{% load static %}
+
+{% block title %}
+    About
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'quiz/css/style_about.css' %}"/>
+{% endblock %}
+
+{% block content %}
+    <div class="about">
+        <div class="about-header">
+            <h1 class="categories-hd">О продукте</h1>
+        </div>
+        <div class="about-content">
+            <h3>LegalTrainer – ваш умный помощник в обучении праву!</h3>
+            <h3>На нашем сайте вы можете проходить увлекательные онлайн тесты по различным отраслям права,
+                отслеживать свой прогресс и изучать статистику.</h3>
+            <h3>Уникальные функции позволяют вам не только тщательно подготовиться к экзаменам,
+                но и получить удовольствие от обучения.</h3>
+            <h3>Погрузитесь в мир юриспруденции с LegalTrainer и станьте настоящим профессионалом права!</h3>
+        </div>
+    </div>
+{% endblock %}

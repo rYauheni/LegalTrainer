@@ -23,11 +23,23 @@ class IndexView(BarMixin, View):
     def get(self, request):
         return render(request, self.template_name)
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         url = super().post(request)
 
         if 'choose_cat' in request.POST:
             url = reverse('categories_list_url')
+
+        return redirect(url)
+
+
+class AboutView(BarMixin, View):
+    template_name = 'quiz/about.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request, *args, **kwargs):
+        url = super().post(request)
 
         return redirect(url)
 
@@ -37,7 +49,7 @@ class ChooseCategoryView(BarMixin, View):
         categories = Category.objects.all().order_by('title')
         return render(request, 'quiz/categories.html', context={'categories': categories})
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         categories = Category.objects.all().order_by('title')
         url = super().post(request)
 
@@ -234,6 +246,6 @@ class ShowTestResultView(BarMixin, View):
             'user_test_result': user_test_result,
         })
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         url = super().post(request)
         return redirect(url)
