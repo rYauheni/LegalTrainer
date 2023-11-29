@@ -70,3 +70,42 @@ li {
 .divider {
     border-top: 1px solid #333333;
 }
+
+/* RESPONSIVE STYLESHEETS */
+
+/* Small Devices, Phones */
+
+@media only screen and (max-width: 767px) {
+    .h-detail {
+        margin-top: 20px;
+    }
+
+    .h-detail-header h3 {
+        font-size: 28px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    .h-detail-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .h-detail-nav {
+        padding-right: 0;
+        text-align: center;
+    }
+
+    .h-detail-nav a {
+        margin: 10px;
+    }
+
+    .h-detail-data {
+        width: 100%;
+    }
+
+    .h-detail-info {
+        max-width: 80%;
+        margin: 0 auto;
+    }
+}

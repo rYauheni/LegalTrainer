@@ -27,3 +27,24 @@
 .success-links a:hover {
     color: #CF8307;
 }
+
+/* RESPONSIVE STYLESHEETS */
+
+/* Small Devices, Phones */
+
+@media only screen and (max-width: 767px) {
+    .success-header h1 {
+        font-size: 28px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    .success-links {
+        flex-direction: column;
+    }
+
+    .success-links a {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}

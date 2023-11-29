@@ -146,3 +146,34 @@ button:hover {
     -moz-box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
     box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
 }
+
+/* RESPONSIVE STYLESHEETS */
+
+/* Small Devices, Phones */
+
+@media only screen and (max-width: 767px) {
+    .change-data-header h1 {
+        font-size: 28px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    .form-data {
+        flex-direction: column;
+    }
+
+    .form-label {
+        width: 100%;
+        text-align: left;
+        margin-bottom: 5px;
+    }
+
+    .form-field {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    button {
+        width: 100%;
+    }
+}
