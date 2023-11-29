@@ -36,3 +36,41 @@
     -moz-box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
     box-shadow: -1px 9px 46px -17px rgba(43, 43, 43, 1);
 }
+
+/* RESPONSIVE STYLESHEETS */
+
+/* Medium Devices, Tablets */
+
+@media only screen and (min-width: 768px) {
+    .categories-hd {
+        font-size: 36px;
+        margin-top: 60px;
+        margin-bottom: 30px;
+    }
+
+    .category-btn {
+        width: 240px;
+        height: 80px;
+    }
+}
+
+/* Small Devices, Phones */
+
+@media only screen and (max-width: 767px) {
+    .categories-hd {
+        font-size: 28px;
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+
+    .categories-list {
+        display: block;
+        text-align: center;
+    }
+
+    .category-btn {
+        width: 80%;
+        height: 60px;
+        margin: 10px auto;
+    }
+}

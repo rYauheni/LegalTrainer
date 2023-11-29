@@ -46,3 +46,59 @@ li {
 .divider {
     border-top: 1px solid #333333;
 }
+
+/* RESPONSIVE STYLESHEETS */
+
+/* Medium Devices, Tablets */
+
+@media only screen and (min-width: 768px) {
+    .result {
+        margin-top: 40px;
+    }
+
+    .result-gen h3 {
+        font-size: 20px;
+        margin-top: 15px;
+        margin-bottom: 10px;
+    }
+
+    .legend,
+    .result-detail {
+        font-size: 16px;
+    }
+
+    .correctness-img {
+        max-width: 15px;
+        max-height: 15px;
+    }
+}
+
+/* Small Devices, Phones */
+
+@media only screen and (max-width: 767px) {
+    .result {
+        margin-top: 20px;
+    }
+
+    .result-gen h3 {
+        font-size: 18px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .legend,
+    .result-detail {
+        font-size: 14px;
+    }
+
+    .correctness-img {
+        max-width: 12px;
+        max-height: 12px;
+    }
+
+    .divider {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+}
+

@@ -53,63 +53,10 @@
         margin-top: 19px;
         right: 1px;
     }
-
-    .feature-section {
-        padding-top: 60px;
-    }
-
-    .features-headline {
-        color: white;
-        padding-bottom: 70px;
-    }
-
-    .logos {
-        padding: 30px;
-        max-width: 100%;
-    }
-
-    .white-section-text {
-        text-align: justify;
-        padding-top: 80px;
-        padding-left: 100px;
-    }
-
-    .imac-section-desc {
-        font-weight: 300;
-        font-size: 15px;
-        line-height: 30px;
-        max-width: 400px;
-        margin: inherit;
-        text-align: left;
-    }
-
-    .pricing-table {
-        padding: 70px 0 100px;
-        max-width: 1050px;
-        margin: auto;
-    }
-
-}
-
-.team {
-    padding-bottom: 130px;
-}
-
-.team-member {
-    text-align: center;
-}
-
-.email-form-div {
-    max-width: inherit;
-    margin: auto;
 }
 
 .webscope {
     margin-top: 0;
-}
-
-.social-links {
-    float: right;
 }
 
 /* Medium Devices, Desktops */

@@ -53,3 +53,49 @@ button:hover {
 .cats-btn:hover {
     background-color: #808080;
 }
+
+/* RESPONSIVE STYLESHEETS */
+
+/* Medium Devices, Tablets */
+
+@media only screen and (min-width: 768px) {
+    .st-h1 {
+        font-size: 36px;
+        margin-top: 60px;
+        margin-bottom: 30px;
+    }
+
+    .st-h3 {
+        font-size: 20px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    button {
+        width: 180px;
+        height: 45px;
+        margin: 20px auto;
+    }
+}
+
+/* Small Devices, Phones */
+
+@media only screen and (max-width: 767px) {
+    .st-h1 {
+        font-size: 28px;
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+
+    .st-h3 {
+        font-size: 18px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    button {
+        width: 80%;
+        height: 40px;
+        margin: 15px auto;
+    }
+}

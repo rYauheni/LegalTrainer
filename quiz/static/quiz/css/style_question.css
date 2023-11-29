@@ -98,3 +98,76 @@ button:hover {
 .back-btn:hover {
     background-color: #808080;
 }
+
+/* RESPONSIVE STYLESHEETS */
+
+/* Medium Devices, Tablets */
+
+@media only screen and (min-width: 768px) {
+    .q-block {
+        margin-top: 40px;
+    }
+
+    .q-number h3 {
+        font-size: 20px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .question h4 {
+        font-size: 16px;
+    }
+
+    .vars {
+        font-size: 16px;
+    }
+
+    button {
+        width: 180px;
+        height: 45px;
+        margin: 20px auto;
+    }
+}
+
+/* Small Devices, Phones */
+
+@media only screen and (max-width: 767px) {
+    .q-block {
+        margin-top: 20px;
+    }
+
+    .q-number {
+        padding-bottom: 40px;
+    }
+
+    .q-number h3 {
+        font-size: 18px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .q-a {
+        flex-direction: column;
+    }
+
+    .question {
+        max-width: 100%;
+        padding-right: 0;
+        align-items: center;
+    }
+
+    .question h4 {
+        font-size: 14px;
+    }
+
+    .vars {
+        font-size: 14px;
+    }
+
+    button {
+        width: 80%;
+        height: 40px;
+        margin: 15px auto;
+    }
+}
+
