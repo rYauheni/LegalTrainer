@@ -88,27 +88,6 @@ body {
     padding-bottom: 60px;
 }
 
-.mouse {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 85%;
-    margin: auto;
-    padding-bottom: 40px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform .4s ease;
-}
-
-.mouse:hover {
-    transform: translateY(5px);
-}
-
-.macbook {
-    margin: auto;
-    padding-bottom: 35px;
-}
-
 .hero-right {
     color: #fff;
     text-align: center;
@@ -171,16 +150,6 @@ body {
 .webscope {
     text-align: center;
     margin-top: -5px;
-}
-
-.social-links {
-    float: none;
-    text-align: center;
-    padding-top: 10px;
-}
-
-.social-link {
-    margin-right: 15px;
 }
 
 .strips {
