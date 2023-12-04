@@ -152,10 +152,6 @@ body {
     margin-top: -5px;
 }
 
-.strips {
-    position: absolute;
-    max-height: 94%;
-}
 
 #f_img {
     max-height: 24px;
