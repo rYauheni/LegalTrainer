@@ -74,7 +74,8 @@ class SetTestView(BarMixin, View):
         qq = QUESTIONS_QUANTITY
         return render(request, 'quiz/start_test.html', context={'category': category, 'qq': qq})
 
-    def post(self, request, slug_category):
+    def post(self, request, slug_category, *args, **kwargs):
+        url = super().post(request)
         if 'start' in request.POST:
             category = Category.objects.get(slug=slug_category)
             questions = Question.objects.filter(category=category)
@@ -101,7 +102,6 @@ class SetTestView(BarMixin, View):
                 user_test_question.order = order
                 user_test_question.save()
 
-            url = super().post(request)
             counter = user_test.counter
 
             url = reverse('question_url', args=(counter,))
