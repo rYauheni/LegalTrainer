@@ -4,8 +4,6 @@ from django.conf import settings
 from quiz.models import Category
 
 
-# Create your models here.
-
 class UserStat(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
