@@ -9,8 +9,6 @@ from unittest.mock import patch
 from quiz.models import Test, UserTestModel, UserTestResult, Category, Question, TestQuestion, Answer, UserTestAnswer
 from userprofile.models import UserStat
 
-from userprofile.views import UserTestHistoryListView
-
 
 class RegisterUserTest(TestCase):
     def setUp(self):
@@ -227,7 +225,6 @@ class ChangePasswordViewTest(TestCase):
         self.assertIsInstance(response.context['form'], PasswordChangeForm)
 
     def test_post_change_password_success(self):
-        # Создаем пользователя для теста
         user = get_user_model().objects.create_user(username='testuser', password='testpass')
         self.client.login(username='testuser', password='testpass')
 

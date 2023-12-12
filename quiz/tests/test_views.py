@@ -64,7 +64,6 @@ class SetTestViewTest(TestCase):
 
         self.category = Category.objects.create(title='Category1', slug='category1')
 
-        # Создаем достаточное количество вопросов для категории
         for i in range(10):
             Question.objects.create(category=self.category, content=f'Question {i}')
 
@@ -91,7 +90,7 @@ class GetQuestionViewTest(TestCase):
         self.test = Test.objects.create()
         self.questions = [
             Question.objects.create(category=self.category, content=f'Question {i}')
-            for i in range(5)  # Замените на нужное количество вопросов
+            for i in range(5)
         ]
         for order, question in enumerate(self.questions):
             TestQuestion.objects.create(test=self.test, question=question, order=order)
@@ -102,7 +101,7 @@ class GetQuestionViewTest(TestCase):
                 content=f'Answer {i}',
                 correctness=True if i % 2 == 0 else False
             )
-            for i in range(4)  # Замените на нужное количество ответов
+            for i in range(4)
         ]
 
         self.user_test = UserTestModel.objects.create(user=self.user, test=self.test, counter=0)
