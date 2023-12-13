@@ -23,7 +23,7 @@ PASSWORD_VALIDATION = {
 }
 
 FONTS = {
-    'fontproperties': FontProperties(family='Montserrat', size=16),
+    'fontproperties': FontProperties(size=16),
     'color': '#333333'
 }
 
