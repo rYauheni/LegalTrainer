@@ -82,8 +82,6 @@ class SetTestView(BarMixin, View):
             question_ids = [question.id for question in questions]
             shuffle(question_ids)
 
-            QUESTIONS_QUANTITY = 10
-
             if len(question_ids) >= QUESTIONS_QUANTITY:
                 question_ids = question_ids[:QUESTIONS_QUANTITY]
 
@@ -137,7 +135,7 @@ class GetQuestionView(BarMixin, View):
                 'question': question,
                 'answers': answers,
                 'counter': counter,
-                'quantity': min(QUESTIONS_QUANTITY, len(questions)),  # Заменить QUESTIONS_QUANTITY на нужное значение
+                'quantity': min(QUESTIONS_QUANTITY, len(questions)),
                 'form': form,
             })
 
@@ -165,15 +163,17 @@ class GetQuestionView(BarMixin, View):
         for id_a in id_user_answers['answers']:
             user_test_answers.user_answers.add(Answer.objects.get(id=id_a))
 
-        if 0 <= counter <= QUESTIONS_QUANTITY - 1:  # Замените QUESTIONS_QUANTITY на нужное значение
+        if 0 <= counter <= len(questions) - 1:
             if form.is_valid():
                 if 'previous' in request.POST:
-                    user_test.counter -= 1
+                    if user_test.counter > 0:
+                        user_test.counter -= 1
                     user_test.save()
                     q_number = user_test.counter
                     url = reverse('question_url', args=(q_number,))
                 elif 'next' in request.POST:
-                    user_test.counter += 1
+                    if user_test.counter < len(questions) - 1:
+                        user_test.counter += 1
                     user_test.save()
                     q_number = user_test.counter
                     url = reverse('question_url', args=(q_number,))
