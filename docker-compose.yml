@@ -11,6 +11,7 @@ services:
 
     volumes:
       - static_volume:/app/static/
+      - media_volume:/app/media/
     expose:
       - "8000"
     depends_on:
