@@ -28,7 +28,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', os.getenv('DB_HOST'), '193.187.175.182', '193.187.175.182:1337']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', os.getenv('DB_HOST'),
+                 '193.187.175.182', '193.187.175.182:1336',
+                 '193.176.190.219', '193.176.190.219:1336']
 
 # Application definition
 
@@ -133,8 +135,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_COOKIE_SECURE = False
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://localhost:1337',
-                        'http://193.187.175.182', 'http://193.187.175.182:1337']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://localhost:1336',
+                        'http://193.187.175.182', 'http://193.187.175.182:1336',
+                        'http://193.176.190.219', 'http://193.176.190.219:1336']
 
 SESSION_COOKIE_SECURE = False
 
