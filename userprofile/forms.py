@@ -100,12 +100,17 @@ class LoginUserForm(AuthenticationForm):
 class UserProfileChangeForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, required=False)
 
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(UserProfileChangeForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = User
         fields = ['username', 'email']
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
+        current_username = self.request.user
 
         if len(username) < USERNAME_VALIDATION['min_length'] or len(username) > USERNAME_VALIDATION['max_length']:
             raise forms.ValidationError(
@@ -118,7 +123,7 @@ class UserProfileChangeForm(forms.ModelForm):
                 'Логин должен содержать только латинские буквы и цифры.'
             )
 
-        if User.objects.filter(username=username).exists():
+        if User.objects.filter(username=username).exists() and str(username) != str(current_username):
             raise forms.ValidationError('Пользователь с таким логином уже существует.')
 
         return username

@@ -83,13 +83,13 @@ class ChangeProfileDataView(View):
     def get(self, request):
         user = request.user
         user_data = {'username': user.username, 'email': user.email}
-        form = UserProfileChangeForm(instance=user)
+        form = UserProfileChangeForm(instance=user, request=request)
         return render(request, self.template_name, context={'form': form, 'user_data': user_data})
 
     def post(self, request):
         user = request.user
         user_data = {'username': user.username, 'email': user.email}
-        form = UserProfileChangeForm(request.POST, instance=user)
+        form = UserProfileChangeForm(request.POST, instance=user, request=request)
         if form.is_valid():
             if form.cleaned_data['password']:
                 if not user.check_password(form.cleaned_data['password']):
