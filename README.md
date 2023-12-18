@@ -142,19 +142,19 @@ ___
 2. Run docker container with command:
 
     ```commandline
-    docker-compose up
+    docker compose up
     ```
 
 3. Apply migrations:
 
     ```commandline
-    docker-compose exec web python manage.py migrate --noinput --settings=LegalTrainer.settings.prod
+    docker compose exec web python manage.py migrate --noinput --settings=LegalTrainer.settings.prod
     ```
 
 4. Create superuser
 
     ```commandline
-    docker-compose exec web python manage.py createsuperuser --settings=LegalTrainer.settings.prod
+    docker compose exec web python manage.py createsuperuser --settings=LegalTrainer.settings.prod
     ```
 
  ___
