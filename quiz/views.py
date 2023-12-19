@@ -222,7 +222,8 @@ class ShowTestResultView(BarMixin, View):
         success_questions = 0
 
         for key in full_result:
-            if full_result[key]['user_answers'] == full_result[key]['correct_answers']:
+            if sorted([answer.id for answer in full_result[key]['user_answers']]) == \
+                    sorted([answer.id for answer in full_result[key]['correct_answers']]):
                 success_questions += 1
 
         correctness_percent = round((100 / quantity_questions * success_questions), 2)
