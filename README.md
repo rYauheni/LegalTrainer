@@ -1,6 +1,6 @@
 # LegalTriner
 
-**LegalTrainer** is a modern online platform designed for legal education. The project offers users the opportunity to 
+[**LegalTrainer**](http://193.187.175.182:1336) is a modern online platform designed for legal education. The project offers users the opportunity to 
 participate in engaging online tests covering various legal fields, track their progress, explore statistics, and 
 compete in leaderboards.
 
@@ -20,6 +20,9 @@ interactivity, progress monitoring, and fostering a competitive spirit among use
 - Monitoring individual user progress.
 - Providing statistics on results and achievements.
 - Establishing a dynamic leaderboard to stimulate user engagement and competition.
+
+
+You can try the application [here](http://193.187.175.182:1336).
 ___
 
 ## Technologies
