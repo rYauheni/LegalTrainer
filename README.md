@@ -1,4 +1,4 @@
-# LegalTriner
+# LegalTrainer
 
 [**LegalTrainer**](http://193.187.175.182:1336) is a modern online platform designed for legal education. The project offers users the opportunity to 
 participate in engaging online tests covering various legal fields, track their progress, explore statistics, and 
